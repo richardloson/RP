@@ -47,13 +47,17 @@
     }
     input[type="text"],
     input[type="date"],
-    input[type="number"], /* Añadido para el estilo de inputs numéricos */
+    input[type="number"],
     textarea {
       width: 100%;
       padding: 10px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
       background-color: white;
+    }
+    input[type="checkbox"] {
+        transform: scale(1.2); /* Agrandar un poco el checkbox */
+        margin-right: 8px;
     }
     .btn {
       padding: 12px 24px;
@@ -68,12 +72,25 @@
     .btn:hover {
       background-color: #1d4ed8;
     }
+    .btn-clear-signature {
+        background-color: #ef4444;
+        margin-top: 8px;
+        font-size: 0.9em;
+        padding: 8px 16px;
+    }
+    .btn-clear-signature:hover {
+        background-color: #dc2626;
+    }
     /* Estilo para el canvas de firma */
     canvas {
         border:1px solid #ccc;
         border-radius:8px;
         background-color: #f9fafb; /* Ligeramente gris para que se vea el borde */
         touch-action: none; /* Previene el scroll en móviles al dibujar */
+    }
+    /* Ocultar botones e inputs en el PDF */
+    .hide-on-pdf {
+        display: none !important;
     }
   </style>
 </head>
@@ -90,7 +107,7 @@
           <label for="lugar">📍 Lugar</label>
           <div class="flex gap-2 mt-1">
             <input type="text" id="lugar" class="border rounded px-3 py-2 w-full" placeholder="Ubicación" inputmode="text">
-            <button onclick="obtenerUbicacion()" class="btn">Ubicación GPS</button>
+            <button onclick="obtenerUbicacion()" class="btn hide-on-pdf">Ubicación GPS</button>
           </div>
         </div>
         <div>
@@ -107,92 +124,156 @@
         </div>
       </div>
 
-      <div class="section-title">Bomba Jockey</div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="input-group"><label>V. Entrada L1-L2</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>V. Entrada L1-L3</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>V. Entrada L2-L3</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Amperaje L1</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Amperaje L2</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Amperaje L3</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Descarga PSI</label><input type="number" inputmode="numeric"></div>
-      </div>
-
-      <div class="section-title mt-8">Bomba Eléctrica</div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="input-group"><label>V. Entrada L1-L2</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>V. Entrada L1-L3</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>V. Entrada L2-L3</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Amperaje L1</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Amperaje L2</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Amperaje L3</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Descarga PSI</label><input type="number" inputmode="numeric"></div>
-      </div>
-
-      <div class="section-title mt-8">Bomba Diésel</div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="input-group"><label>Nivel Agua/Aceite</label><input type="text" inputmode="text"></div>
-        <div class="input-group"><label>Diesel (+¾ / -¾)</label><input type="text" inputmode="text"></div>
-        <div class="input-group"><label>Presión Aceite PSI</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Temperatura Inicial °C</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Temperatura Final °C</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Horas Inicial</label><input type="number" inputmode="numeric"></div>
-        <div class="input-group"><label>Horas Final</label><input type="number" inputmode="numeric"></div>
-      </div>
-      <div class="section-title mt-10">Evidencia Fotográfica</div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div>
-          <label>Foto 1</label>
-          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
-        </div>
-        <div>
-          <label>Foto 2</label>
-          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
-        </div>
-        <div>
-          <label>Foto 3</label>
-          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
-        </div>
-        <div>
-          <label>Foto 4</label>
-          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
-        </div>
-        <div>
-          <label>Foto 5</label>
-          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
-        </div>
-        <div>
-          <label>Foto 6</label>
-          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
-        </div>
-      </div>
-      <div class="section-title mt-10">Firmas</div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-
-        <div>
-          <label>Firma del Técnico</label>
-          <canvas id="firmaTecnico" width="300" height="150"></canvas>
-          <button class="btn btn-clear-signature" onclick="clearSignature('firmaTecnico')">Limpiar</button>
-          <input type="text" id="nombreTecnicoFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del técnico">
+      <div id="seccionBombas">
+        <div class="section-title">Bomba Jockey</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="input-group"><label>V. Entrada L1-L2</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>V. Entrada L1-L3</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>V. Entrada L2-L3</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Amperaje L1</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Amperaje L2</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Amperaje L3</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Descarga PSI</label><input type="number" inputmode="numeric"></div>
         </div>
 
-        <div>
-          <label>Firma del Supervisor</label>
-          <canvas id="firmaSupervisor" width="300" height="150"></canvas>
-          <button class="btn btn-clear-signature" onclick="clearSignature('firmaSupervisor')">Limpiar</button>
-          <input type="text" id="nombreSupervisorFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del supervisor">
+        <div class="section-title mt-8">Bomba Eléctrica</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="input-group"><label>V. Entrada L1-L2</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>V. Entrada L1-L3</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>V. Entrada L2-L3</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Amperaje L1</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Amperaje L2</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Amperaje L3</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Descarga PSI</label><input type="number" inputmode="numeric"></div>
         </div>
-      </div>
 
-      <div class="section-title mt-10">Observaciones</div>
-      <textarea id="observaciones" class="w-full h-24 p-3 border rounded mb-4" placeholder="Observaciones generales..."></textarea>
+        <div class="section-title mt-8">Bomba Diésel</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="input-group">
+            <label>Nivel Agua</label>
+            <div class="flex items-center mt-1">
+                <input type="text" inputmode="text" placeholder="Estado del nivel de agua">
+                <input type="checkbox" id="checkAguaOK" class="ml-2"> <label for="checkAguaOK" class="text-sm font-normal">OK</label>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Nivel Aceite</label>
+            <div class="flex items-center mt-1">
+                <input type="text" inputmode="text" placeholder="Estado del nivel de aceite">
+                <input type="checkbox" id="checkAceiteOK" class="ml-2"> <label for="checkAceiteOK" class="text-sm font-normal">OK</label>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Diesel (+¾ / -¾)</label>
+            <input type="text" inputmode="text" placeholder="Nivel de Diesel">
+          </div>
+          <div class="input-group">
+            <label>Faltante de Litros (Diesel)</label>
+            <input type="number" inputmode="numeric" placeholder="Litros faltantes">
+          </div>
+          <div class="input-group"><label>Presión Aceite PSI</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Temperatura Inicial °C</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Temperatura Final °C</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Horas Inicial</label><input type="number" inputmode="numeric"></div>
+          <div class="input-group"><label>Horas Final</label><input type="number" inputmode="numeric"></div>
+        </div>
+      </div><div id="seccionHidrantes">
+        <div class="section-title mt-10">Inspección de Hidrantes</div>
+        <div id="hidrantes-container">
+          </div>
+        <button onclick="agregarHidrante()" class="btn w-full sm:w-auto mt-4 hide-on-pdf">Agregar Otro Hidrante</button>
+      </div><div id="seccionFotos">
+        <div class="section-title mt-10">Evidencia Fotográfica</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="photo-upload-container">
+          <div class="input-group">
+              <label>Foto 1</label>
+              <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full" data-photo-id="1">
+              <input type="text" class="photo-location border rounded px-3 py-2 w-full mt-2" placeholder="Ubicación de la Foto 1">
+              <img class="photo-preview mt-2 w-full h-32 object-cover hidden" src="" alt="Previsualización de Foto 1">
+          </div>
+          <div class="input-group">
+              <label>Foto 2</label>
+              <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full" data-photo-id="2">
+              <input type="text" class="photo-location border rounded px-3 py-2 w-full mt-2" placeholder="Ubicación de la Foto 2">
+              <img class="photo-preview mt-2 w-full h-32 object-cover hidden" src="" alt="Previsualización de Foto 2">
+          </div>
+          <div class="input-group">
+              <label>Foto 3</label>
+              <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full" data-photo-id="3">
+              <input type="text" class="photo-location border rounded px-3 py-2 w-full mt-2" placeholder="Ubicación de la Foto 3">
+              <img class="photo-preview mt-2 w-full h-32 object-cover hidden" src="" alt="Previsualización de Foto 3">
+          </div>
+          <div class="input-group">
+              <label>Foto 4</label>
+              <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full" data-photo-id="4">
+              <input type="text" class="photo-location border rounded px-3 py-2 w-full mt-2" placeholder="Ubicación de la Foto 4">
+              <img class="photo-preview mt-2 w-full h-32 object-cover hidden" src="" alt="Previsualización de Foto 4">
+          </div>
+          <div class="input-group">
+              <label>Foto 5</label>
+              <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full" data-photo-id="5">
+              <input type="text" class="photo-location border rounded px-3 py-2 w-full mt-2" placeholder="Ubicación de la Foto 5">
+              <img class="photo-preview mt-2 w-full h-32 object-cover hidden" src="" alt="Previsualización de Foto 5">
+          </div>
+          <div class="input-group">
+              <label>Foto 6</label>
+              <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full" data-photo-id="6">
+              <input type="text" class="photo-location border rounded px-3 py-2 w-full mt-2" placeholder="Ubicación de la Foto 6">
+              <img class="photo-preview mt-2 w-full h-32 object-cover hidden" src="" alt="Previsualización de Foto 6">
+          </div>
+        </div>
+      </div><div id="seccionFirmas">
+        <div class="section-title mt-10">Firmas</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
 
-      <div class="flex flex-col sm:flex-row gap-4 mt-4">
+          <div>
+            <label>Firma del Técnico</label>
+            <canvas id="firmaTecnico" width="300" height="150"></canvas>
+            <button class="btn btn-clear-signature hide-on-pdf" onclick="clearSignature('firmaTecnico')">Limpiar</button>
+            <input type="text" id="nombreTecnicoFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del técnico">
+          </div>
+
+          <div>
+            <label>Firma del Supervisor</label>
+            <canvas id="firmaSupervisor" width="300" height="150"></canvas>
+            <button class="btn btn-clear-signature hide-on-pdf" onclick="clearSignature('firmaSupervisor')">Limpiar</button>
+            <input type="text" id="nombreSupervisorFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del supervisor">
+          </div>
+        </div>
+      </div><div id="seccionObservaciones">
+        <div class="section-title mt-10">Observaciones</div>
+        <textarea id="observaciones" class="w-full h-24 p-3 border rounded mb-4" placeholder="Observaciones generales..."></textarea>
+      </div><div class="flex flex-col sm:flex-row gap-4 mt-4 hide-on-pdf">
         <button id="pdfBtn" class="btn w-full sm:w-auto">Exportar a PDF</button>
         <button id="mailBtn" class="btn w-full sm:w-auto bg-green-600 hover:bg-green-700">Enviar por correo</button>
+        <button id="whatsappBtn" class="btn w-full sm:w-auto bg-blue-600 hover:bg-blue-700">Compartir por WhatsApp</button>
       </div>
     </div> <script>
       const { jsPDF } = window.jspdf;
+      let hidranteCount = 0; // Contador para hidrantes
+
+      document.addEventListener('DOMContentLoaded', () => {
+          agregarHidrante(); // Añadir el primer hidrante al cargar la página
+          // Previsualización de imágenes
+          document.querySelectorAll('input[type="file"]').forEach(input => {
+              input.addEventListener('change', function(event) {
+                  const file = event.target.files[0];
+                  if (file) {
+                      const reader = new FileReader();
+                      reader.onload = function(e) {
+                          const imgPreview = input.nextElementSibling.nextElementSibling; // Asumiendo input -> photo-location -> photo-preview
+                          imgPreview.src = e.target.result;
+                          imgPreview.classList.remove('hidden');
+                      };
+                      reader.readAsDataURL(file);
+                  } else {
+                      const imgPreview = input.nextElementSibling.nextElementSibling;
+                      imgPreview.src = '';
+                      imgPreview.classList.add('hidden');
+                  }
+              });
+          });
+      });
 
       // Función para inicializar canvas de firma
       function inicializarCanvasFirma(idCanvas) {
@@ -270,19 +351,38 @@
       inicializarCanvasFirma("firmaTecnico");
       inicializarCanvasFirma("firmaSupervisor");
 
-
-      // Obtener ubicación GPS (no un mapa interactivo)
-      function obtenerUbicacion() {
+      // Convertir coordenadas a ubicación y obtener ubicación GPS
+      async function obtenerUbicacion() {
+        document.getElementById("lugar").value = "Obteniendo ubicación...";
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
-            pos => {
-              const lat = pos.coords.latitude.toFixed(5);
-              const lon = pos.coords.longitude.toFixed(5);
-              document.getElementById("lugar").value = `Lat: ${lat}, Lon: ${lon}`;
-              alert("Ubicación obtenida por GPS.");
+            async pos => {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+              const lugarInput = document.getElementById("lugar");
+
+              try {
+                // Usar Nominatim para geocodificación inversa
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+                const data = await response.json();
+
+                if (data.display_name) {
+                  lugarInput.value = data.display_name;
+                  console.log("Ubicación obtenida:", data.display_name);
+                } else {
+                  lugarInput.value = `Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
+                  console.warn("No se encontró nombre de ubicación para las coordenadas.");
+                }
+              } catch (error) {
+                console.error("Error al obtener nombre de ubicación:", error);
+                lugarInput.value = `Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
+                alert("No se pudo obtener el nombre de la ubicación, mostrando coordenadas.");
+              }
             },
             err => {
+              console.error("Error al obtener ubicación GPS:", err);
               alert("No se pudo obtener la ubicación. Activa permisos de GPS y asegúrate de tener conexión.");
+              document.getElementById("lugar").value = "Ubicación no disponible";
             },
             {
               enableHighAccuracy: true,
@@ -292,93 +392,190 @@
           );
         } else {
           alert("Tu navegador no permite geolocalización.");
+          document.getElementById("lugar").value = "Geolocalización no soportada";
         }
       }
 
+      // Funcionalidad para añadir hidrantes dinámicamente
+      function agregarHidrante() {
+        hidranteCount++;
+        const container = document.getElementById('hidrantes-container');
+        const newHidranteDiv = document.createElement('div');
+        newHidranteDiv.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 hidrante-item'; // Added hidrante-item class
+        newHidranteDiv.innerHTML = `
+          <div class="input-group">
+            <label>Hidrante N° ${hidranteCount}</label>
+            <input type="text" class="w-full" placeholder="Identificador del hidrante (ej. H-01)">
+          </div>
+          <div class="input-group">
+            <label>Comentarios Hidrante N° ${hidranteCount}</label>
+            <textarea class="w-full h-24 p-3 border rounded" placeholder="Comentarios sobre el hidrante..."></textarea>
+          </div>
+        `;
+        container.appendChild(newHidranteDiv);
+      }
+
+      // Función para preparar y capturar una sección específica del DOM
+      async function captureSection(elementId) {
+          const element = document.getElementById(elementId);
+          // Ocultar botones e inputs solo si están dentro de la sección para el PDF
+          const elementsToHide = element.querySelectorAll('.hide-on-pdf');
+          elementsToHide.forEach(el => el.classList.add('hidden'));
+
+          const canvas = await html2canvas(element, {
+              scale: 2, // Aumenta la resolución
+              useCORS: true,
+              allowTaint: true,
+              logging: false,
+              scrollX: 0,
+              scrollY: 0,
+              windowWidth: element.scrollWidth,
+              windowHeight: element.scrollHeight,
+          });
+
+          elementsToHide.forEach(el => el.classList.remove('hidden')); // Restaurar visibilidad
+          return canvas.toDataURL('image/png');
+      }
+
       // Exportar PDF
-      document.getElementById("pdfBtn").addEventListener("click", () => {
-        const inputElements = document.querySelectorAll('input, textarea');
-        inputElements.forEach(input => {
-            input.style.border = 'none'; // Eliminar bordes para el PDF
-            input.style.backgroundColor = 'transparent'; // Eliminar fondo
-        });
+      document.getElementById("pdfBtn").addEventListener("click", async () => {
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10; // Margen de 10mm en cada lado
 
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(button => {
-            button.style.display = 'none'; // Ocultar botones
-        });
+        const contentWidth = pageWidth - 2 * margin;
 
-        // Asegurarse de que el color de fondo del body sea blanco para la captura
+        // Ocultar todos los botones para la captura
+        document.querySelectorAll('.hide-on-pdf').forEach(btn => btn.classList.add('hidden'));
+        // Asegurarse de que el body tenga un fondo blanco para la captura
         document.body.style.backgroundColor = '#ffffff';
 
-        html2canvas(document.getElementById("reporteContent"), {
-            scale: 2, // Aumenta la resolución para mejor calidad del PDF
-            useCORS: true, // Importante si hay imágenes de diferentes orígenes (como firmas)
-            allowTaint: true, // Permitir contenido "tainted" (menos seguro pero a veces necesario)
-            logging: true, // Habilita el log para depuración
-            scrollX: 0, // Asegura que se captura desde el inicio del scroll
-            scrollY: 0,
-            windowWidth: document.documentElement.offsetWidth, // Captura el ancho completo de la ventana
-            windowHeight: document.documentElement.offsetHeight
-        }).then(canvas => {
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4");
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
+        let yOffset = margin;
+
+        // 1. Capturar y añadir la sección de datos generales
+        const datosGenerales = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.gap-4.mb-6');
+        if (datosGenerales) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `<div class="header" style="background-color: #1e40af; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;"><h1 class="text-3xl font-bold">RCI Sistemas Contra Incendio</h1></div>` + datosGenerales.outerHTML;
+            document.body.appendChild(tempDiv);
+            const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true, allowTaint: true });
+            document.body.removeChild(tempDiv);
+
+            const imgData = canvas.toDataURL('image/png');
             const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * contentWidth) / imgProps.width;
 
-            // Calcular el alto de la imagen en el PDF manteniendo el aspect ratio
-            const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+            pdf.addImage(imgData, 'PNG', margin, yOffset, contentWidth, imgHeight);
+            yOffset += imgHeight + margin; // Espacio después de la sección
+        }
 
-            let position = 0; // Posición vertical en el PDF
+        // 2. Capturar y añadir la sección de Bombas
+        const bombasDataUrl = await captureSection('seccionBombas');
+        const bombasImgProps = pdf.getImageProperties(bombasDataUrl);
+        const bombasImgHeight = (bombasImgProps.height * contentWidth) / bombasImgProps.width;
 
-            // Si la altura de la imagen es mayor que la altura de una página, se divide en varias páginas
-            if (pdfHeight > pageHeight) {
-                let currentPage = 1;
-                let remainingHeight = pdfHeight;
+        if (yOffset + bombasImgHeight > pageHeight - margin) { // Si no cabe en la página actual
+            pdf.addPage();
+            yOffset = margin;
+        }
+        pdf.addImage(bombasDataUrl, 'PNG', margin, yOffset, contentWidth, bombasImgHeight);
+        yOffset += bombasImgHeight + margin;
 
-                while (remainingHeight > 0) {
-                    pdf.addImage(imgData, "PNG", 0, position, pageWidth, pdfHeight);
-                    remainingHeight -= pageHeight;
-                    position -= pageHeight; // Mueve la posición para la siguiente "ventana" de la imagen
-                    if (remainingHeight > 0) {
-                        pdf.addPage();
-                        currentPage++;
-                    }
+        // 3. Capturar y añadir la sección de Hidrantes
+        const hidrantesDataUrl = await captureSection('seccionHidrantes');
+        const hidrantesImgProps = pdf.getImageProperties(hidrantesDataUrl);
+        const hidrantesImgHeight = (hidrantesImgProps.height * contentWidth) / hidrantesImgProps.width;
+
+        if (yOffset + hidrantesImgHeight > pageHeight - margin) {
+            pdf.addPage();
+            yOffset = margin;
+        }
+        pdf.addImage(hidrantesDataUrl, 'PNG', margin, yOffset, contentWidth, hidrantesImgHeight);
+        yOffset += hidrantesImgHeight + margin;
+
+        // 4. Capturar y añadir la sección de Evidencia Fotográfica (imágenes reales)
+        pdf.addPage(); // Siempre empezar fotos en una nueva página
+        yOffset = margin;
+        pdf.text("Evidencia Fotográfica", margin, yOffset + 5);
+        yOffset += 15; // Espacio después del título
+
+        const photoContainer = document.getElementById('photo-upload-container');
+        const photoPreviews = photoContainer.querySelectorAll('.photo-preview:not(.hidden)');
+        const photoLocations = photoContainer.querySelectorAll('.photo-location');
+
+        for (let i = 0; i < photoPreviews.length; i++) {
+            const imgPreview = photoPreviews[i];
+            const locationInput = photoLocations[i];
+
+            if (imgPreview.src && imgPreview.src !== window.location.href) { // Asegurarse de que haya una imagen cargada
+                const imgProps = pdf.getImageProperties(imgPreview.src);
+                let imgHeight = (imgProps.height * contentWidth) / imgProps.width;
+                const maxImgHeight = (pageHeight - margin * 2) / 3; // Límite para 3 fotos por página
+                if (imgHeight > maxImgHeight) imgHeight = maxImgHeight;
+
+                if (yOffset + imgHeight + 10 > pageHeight - margin) { // 10 para el texto de la ubicación
+                    pdf.addPage();
+                    yOffset = margin;
                 }
-            } else {
-                pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pdfHeight);
+                pdf.addImage(imgPreview.src, 'PNG', margin, yOffset, contentWidth, imgHeight);
+                yOffset += imgHeight + 5; // Espacio después de la imagen
+
+                // Añadir texto de ubicación de la foto
+                if (locationInput.value) {
+                    pdf.setFontSize(10);
+                    pdf.text(`Ubicación: ${locationInput.value}`, margin, yOffset);
+                    yOffset += 10; // Espacio después del texto
+                } else {
+                    yOffset += 5; // Espacio extra si no hay ubicación
+                }
             }
+        }
 
-            pdf.save("RCI_reporte_servicio.pdf");
 
-            // Restaurar estilos después de la exportación
-            inputElements.forEach(input => {
-                input.style.border = ''; // Restaurar borde
-                input.style.backgroundColor = ''; // Restaurar fondo
-            });
-            buttons.forEach(button => {
-                button.style.display = ''; // Restaurar visibilidad
-            });
-            document.body.style.backgroundColor = ''; // Restaurar color de fondo del body
+        // 5. Capturar y añadir las secciones de Firmas y Observaciones
+        const firmasObsTempDiv = document.createElement('div');
+        firmasObsTempDiv.id = "tempFirmasObs";
+        firmasObsTempDiv.innerHTML = document.getElementById('seccionFirmas').outerHTML + document.getElementById('seccionObservaciones').outerHTML + `<div class="footer" style="background-color: #1e3a8a; color: white; text-align: center; padding: 10px; margin-top: 40px; border-radius: 0 0 10px 10px;"><p class="text-sm">RCI México — Certificados NFPA</p></div>`;
+        document.body.appendChild(firmasObsTempDiv); // Añadir temporalmente al DOM para html2canvas
 
-        }).catch(error => {
-            console.error("Error al generar PDF:", error);
-            alert("Hubo un error al generar el PDF. Por favor, revisa la consola para más detalles.");
+        // Asegurarse de que los canvas de firma se capturen correctamente
+        const firmaTecnicoCanvas = firmasObsTempDiv.querySelector('#firmaTecnico');
+        const firmaSupervisorCanvas = firmasObsTempDiv.querySelector('#firmaSupervisor');
+        const originalTecnicoCanvas = document.getElementById('firmaTecnico');
+        const originalSupervisorCanvas = document.getElementById('firmaSupervisor');
 
-            // Asegurarse de restaurar los estilos incluso si hay un error
-            const inputElements = document.querySelectorAll('input, textarea');
-            inputElements.forEach(input => {
-                input.style.border = '';
-                input.style.backgroundColor = '';
-            });
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(button => {
-                button.style.display = '';
-            });
-            document.body.style.backgroundColor = '';
-        });
+        if (originalTecnicoCanvas && firmaTecnicoCanvas) {
+            const ctxTecnico = firmaTecnicoCanvas.getContext('2d');
+            ctxTecnico.drawImage(originalTecnicoCanvas, 0, 0);
+        }
+        if (originalSupervisorCanvas && firmaSupervisorCanvas) {
+            const ctxSupervisor = firmaSupervisorCanvas.getContext('2d');
+            ctxSupervisor.drawImage(originalSupervisorCanvas, 0, 0);
+        }
+
+
+        const firmasObsDataUrl = await html2canvas(firmasObsTempDiv, {
+            scale: 2, useCORS: true, allowTaint: true, logging: false
+        }).then(canvas => canvas.toDataURL('image/png'));
+        document.body.removeChild(firmasObsTempDiv); // Remover del DOM
+
+        const firmasObsImgProps = pdf.getImageProperties(firmasObsDataUrl);
+        const firmasObsImgHeight = (firmasObsImgProps.height * contentWidth) / firmasObsImgProps.width;
+
+        if (yOffset + firmasObsImgHeight > pageHeight - margin) {
+            pdf.addPage();
+            yOffset = margin;
+        }
+        pdf.addImage(firmasObsDataUrl, 'PNG', margin, yOffset, contentWidth, firmasObsImgHeight);
+
+        pdf.save("RCI_reporte_servicio.pdf");
+
+        // Restaurar visibilidad de los botones
+        document.querySelectorAll('.hide-on-pdf').forEach(btn => btn.classList.remove('hidden'));
+        document.body.style.backgroundColor = ''; // Restaurar color de fondo del body
       });
+
 
       // Enviar correo (sin adjuntos, por limitación de mailto:)
       document.getElementById("mailBtn").addEventListener("click", () => {
@@ -394,6 +591,19 @@
         // Los adjuntos NO se pueden enviar directamente con mailto:.
         window.location.href = `mailto:rciadan2024@gmail.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
       });
+
+      // Compartir PDF por WhatsApp
+      document.getElementById("whatsappBtn").addEventListener("click", () => {
+        alert("Para compartir por WhatsApp, primero genera el PDF y luego adjúntalo manualmente desde la aplicación de WhatsApp. Este botón abrirá WhatsApp con un mensaje predefinido.");
+        const lugar = document.getElementById("lugar").value;
+        const tecnico = document.getElementById("tecnico").value;
+        const fecha = document.getElementById("fecha").value;
+        const mensaje = `Hola, te comparto el Reporte Técnico de Servicios RCI.\n\nLugar: ${lugar}\nTécnico: ${tecnico}\nFecha: ${fecha}\n\nFavor de adjuntar el PDF generado previamente.`;
+
+        // Se usa web.whatsapp.com para la versión de escritorio/móvil
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
+      });
+
     </script>
 
     <div class="footer">
