@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>RCI - Reporte Técnico de Servicios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- jsPDF + html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f5f9;
+    }
+    .header {
+      background-color: #1e40af;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+    .footer {
+      background-color: #1e3a8a;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: 40px;
+      border-radius: 0 0 10px 10px;
+    }
+    .section-title {
+      border-left: 4px solid #1d4ed8;
+      padding-left: 12px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #1e3a8a;
+    }
+    .input-group {
+      margin-bottom: 16px;
+    }
+    label {
+      font-weight: 600;
+      color: #1e3a8a;
+    }
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background-color: white;
+    }
+    .btn {
+      padding: 12px 24px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn:hover {
+      background-color: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="max-w-5xl mx-auto mt-6 shadow-xl bg-white rounded-xl overflow-hidden">
+
+    <!-- 🧢 Encabezado institucional -->
+    <div class="header">
+      <h1 class="text-3xl font-bold">RCI Sistemas Contra Incendio</h1>
+    </div>
+
+    <div class="px-6 py-4">
+      <!-- Aquí se insertará la sección de datos técnicos, ubicación, fotos y firmas en los próximos bloques -->
+      <!-- 🔧 DATOS GENERALES + UBICACIÓN -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label for="lugar">📍 Lugar</label>
+          <div class="flex gap-2 mt-1">
+            <input type="text" id="lugar" class="border rounded px-3 py-2 w-full" placeholder="Ubicación">
+            <button onclick="obtenerUbicacion()" class="btn">Ubicación</button>
+          </div>
+        </div>
+        <div>
+          <label for="tecnico">👷 Técnico</label>
+          <input type="text" id="tecnico" class="border rounded px-3 py-2 w-full mt-1" placeholder="Nombre">
+        </div>
+        <div>
+          <label for="atiende">👤 Atiende</label>
+          <input type="text" id="atiende" class="border rounded px-3 py-2 w-full mt-1" placeholder="Responsable en sitio">
+        </div>
+        <div>
+          <label for="fecha">📅 Fecha</label>
+          <input type="date" id="fecha" class="border rounded px-3 py-2 w-full mt-1">
+        </div>
+      </div>
+
+      <!-- 🧯 BOMBA JOCKEY -->
+      <div class="section-title">Bomba Jockey</div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="input-group"><label>V. Entrada L1-L2</label><input type="text"></div>
+        <div class="input-group"><label>V. Entrada L1-L3</label><input type="text"></div>
+        <div class="input-group"><label>V. Entrada L2-L3</label><input type="text"></div>
+        <div class="input-group"><label>Amperaje L1</label><input type="text"></div>
+        <div class="input-group"><label>Amperaje L2</label><input type="text"></div>
+        <div class="input-group"><label>Amperaje L3</label><input type="text"></div>
+        <div class="input-group"><label>Descarga PSI</label><input type="text"></div>
+      </div>
+
+      <!-- ⚡ BOMBA ELÉCTRICA -->
+      <div class="section-title mt-8">Bomba Eléctrica</div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="input-group"><label>V. Entrada L1-L2</label><input type="text"></div>
+        <div class="input-group"><label>V. Entrada L1-L3</label><input type="text"></div>
+        <div class="input-group"><label>V. Entrada L2-L3</label><input type="text"></div>
+        <div class="input-group"><label>Amperaje L1</label><input type="text"></div>
+        <div class="input-group"><label>Amperaje L2</label><input type="text"></div>
+        <div class="input-group"><label>Amperaje L3</label><input type="text"></div>
+        <div class="input-group"><label>Descarga PSI</label><input type="text"></div>
+      </div>
+
+      <!-- 🔥 BOMBA DIÉSEL -->
+      <div class="section-title mt-8">Bomba Diésel</div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="input-group"><label>Nivel Agua/Aceite</label><input type="text"></div>
+        <div class="input-group"><label>Diesel (+¾ / -¾)</label><input type="text"></div>
+        <div class="input-group"><label>Presión Aceite PSI</label><input type="text"></div>
+        <div class="input-group"><label>Temperatura Inicial °C</label><input type="text"></div>
+        <div class="input-group"><label>Temperatura Final °C</label><input type="text"></div>
+        <div class="input-group"><label>Horas Inicial</label><input type="text"></div>
+        <div class="input-group"><label>Horas Final</label><input type="text"></div>
+      </div>
+      <!-- 📸 EVIDENCIA FOTOGRÁFICA -->
+      <div class="section-title mt-10">Evidencia Fotográfica</div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label>Foto 1</label>
+          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
+        </div>
+        <div>
+          <label>Foto 2</label>
+          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
+        </div>
+        <div>
+          <label>Foto 3</label>
+          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
+        </div>
+        <div>
+          <label>Foto 4</label>
+          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
+        </div>
+        <div>
+          <label>Foto 5</label>
+          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
+        </div>
+        <div>
+          <label>Foto 6</label>
+          <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
+        </div>
+      </div>
+      <!-- ✍️ FIRMAS -->
+      <div class="section-title mt-10">Firmas</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+
+        <div>
+          <label>Firma del Técnico</label>
+          <canvas id="firmaTecnico" width="300" height="150" style="border:1px solid #ccc; border-radius:8px;"></canvas>
+          <input type="text" id="nombreTecnicoFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del técnico">
+        </div>
+
+        <div>
+          <label>Firma del Supervisor</label>
+          <canvas id="firmaSupervisor" width="300" height="150" style="border:1px solid #ccc; border-radius:8px;"></canvas>
+          <input type="text" id="nombreSupervisorFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del supervisor">
+        </div>
+      </div>
+
+      <!-- 📋 OBSERVACIONES -->
+      <div class="section-title mt-10">Observaciones</div>
+      <textarea class="w-full h-24 p-3 border rounded mb-4" placeholder="Observaciones generales..."></textarea>
+
+      <!-- BOTONES -->
+      <div class="flex flex-col sm:flex-row gap-4 mt-4">
+        <button id="pdfBtn" class="btn w-full sm:w-auto">Exportar a PDF</button>
+        <button id="mailBtn" class="btn w-full sm:w-auto bg-green-600 hover:bg-green-700">Enviar por correo</button>
+      </div>
+    </div> <!-- Cierre del cuerpo del reporte -->
+    <!-- 🧠 Scripts funcionales -->
+    <script>
+      const { jsPDF } = window.jspdf;
+
+      function obtenerUbicacion() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            pos => {
+              const lat = pos.coords.latitude.toFixed(5);
+              const lon = pos.coords.longitude.toFixed(5);
+              document.getElementById("lugar").value = `Lat: ${lat}, Lon: ${lon}`;
+            },
+            err => {
+              alert("No se pudo obtener la ubicación. Activa permisos de GPS.");
+            }
+          );
+        } else {
+          alert("Tu navegador no permite geolocalización.");
+        }
+      }
+
+      // Firma digital
+      function inicializarCanvasFirma(idCanvas) {
+        const canvas = document.getElementById(idCanvas);
+        const ctx = canvas.getContext("2d");
+        let dibujando = false;
+
+        canvas.addEventListener("mousedown", () => dibujando = true);
+        canvas.addEventListener("mouseup", () => dibujando = false);
+        canvas.addEventListener("mousemove", e => {
+          if (!dibujando) return;
+          const rect = canvas.getBoundingClientRect();
+          ctx.lineWidth = 2;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = "#111827";
+          ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        });
+      }
+
+      inicializarCanvasFirma("firmaTecnico");
+      inicializarCanvasFirma("firmaSupervisor");
+
+      // Exportar PDF
+      document.getElementById("pdfBtn").addEventListener("click", () => {
+        html2canvas(document.querySelector(".max-w-5xl")).then(canvas => {
+          const imgData = canvas.toDataURL("image/png");
+          const pdf = new jsPDF("p", "mm", "a4");
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const imgProps = pdf.getImageProperties(imgData);
+          const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+
+          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pdfHeight);
+          pdf.save("RCI_reporte_servicio.pdf");
+        });
+      });
+
+      // Enviar correo
+      document.getElementById("mailBtn").addEventListener("click", () => {
+        const lugar = document.getElementById("lugar").value;
+        const tecnico = document.getElementById("tecnico").value;
+        const fecha = document.getElementById("fecha").value;
+        const asunto = `Reporte técnico - ${fecha}`;
+        const cuerpo = `Lugar: ${lugar}\nTécnico: ${tecnico}\n\nSe adjunta el reporte generado.`;
+        window.location.href = `mailto:rciadan2024@gmail.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+      });
+    </script>
+
+    <!-- 📌 Pie de página institucional -->
+    <div class="footer">
+      <p class="text-sm">RCI México — Certificados NFPA</p>
+    </div>
+  </div>
+</body>
+</html>
