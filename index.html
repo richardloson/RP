@@ -5,10 +5,8 @@
   <title>RCI - Reporte Técnico de Servicios</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- jsPDF + html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -49,6 +47,7 @@
     }
     input[type="text"],
     input[type="date"],
+    input[type="number"], /* Añadido para el estilo de inputs numéricos */
     textarea {
       width: 100%;
       padding: 10px;
@@ -69,25 +68,29 @@
     .btn:hover {
       background-color: #1d4ed8;
     }
+    /* Estilo para el canvas de firma */
+    canvas {
+        border:1px solid #ccc;
+        border-radius:8px;
+        background-color: #f9fafb; /* Ligeramente gris para que se vea el borde */
+        touch-action: none; /* Previene el scroll en móviles al dibujar */
+    }
   </style>
 </head>
 <body>
-  <div class="max-w-5xl mx-auto mt-6 shadow-xl bg-white rounded-xl overflow-hidden">
+  <div class="max-w-5xl mx-auto mt-6 shadow-xl bg-white rounded-xl overflow-hidden" id="reporteContent">
 
-    <!-- 🧢 Encabezado institucional -->
     <div class="header">
       <h1 class="text-3xl font-bold">RCI Sistemas Contra Incendio</h1>
     </div>
 
     <div class="px-6 py-4">
-      <!-- Aquí se insertará la sección de datos técnicos, ubicación, fotos y firmas en los próximos bloques -->
-      <!-- 🔧 DATOS GENERALES + UBICACIÓN -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div>
           <label for="lugar">📍 Lugar</label>
           <div class="flex gap-2 mt-1">
-            <input type="text" id="lugar" class="border rounded px-3 py-2 w-full" placeholder="Ubicación">
-            <button onclick="obtenerUbicacion()" class="btn">Ubicación</button>
+            <input type="text" id="lugar" class="border rounded px-3 py-2 w-full" placeholder="Ubicación" inputmode="text">
+            <button onclick="obtenerUbicacion()" class="btn">Ubicación GPS</button>
           </div>
         </div>
         <div>
@@ -104,42 +107,38 @@
         </div>
       </div>
 
-      <!-- 🧯 BOMBA JOCKEY -->
       <div class="section-title">Bomba Jockey</div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="input-group"><label>V. Entrada L1-L2</label><input type="text"></div>
-        <div class="input-group"><label>V. Entrada L1-L3</label><input type="text"></div>
-        <div class="input-group"><label>V. Entrada L2-L3</label><input type="text"></div>
-        <div class="input-group"><label>Amperaje L1</label><input type="text"></div>
-        <div class="input-group"><label>Amperaje L2</label><input type="text"></div>
-        <div class="input-group"><label>Amperaje L3</label><input type="text"></div>
-        <div class="input-group"><label>Descarga PSI</label><input type="text"></div>
+        <div class="input-group"><label>V. Entrada L1-L2</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>V. Entrada L1-L3</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>V. Entrada L2-L3</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Amperaje L1</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Amperaje L2</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Amperaje L3</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Descarga PSI</label><input type="number" inputmode="numeric"></div>
       </div>
 
-      <!-- ⚡ BOMBA ELÉCTRICA -->
       <div class="section-title mt-8">Bomba Eléctrica</div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="input-group"><label>V. Entrada L1-L2</label><input type="text"></div>
-        <div class="input-group"><label>V. Entrada L1-L3</label><input type="text"></div>
-        <div class="input-group"><label>V. Entrada L2-L3</label><input type="text"></div>
-        <div class="input-group"><label>Amperaje L1</label><input type="text"></div>
-        <div class="input-group"><label>Amperaje L2</label><input type="text"></div>
-        <div class="input-group"><label>Amperaje L3</label><input type="text"></div>
-        <div class="input-group"><label>Descarga PSI</label><input type="text"></div>
+        <div class="input-group"><label>V. Entrada L1-L2</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>V. Entrada L1-L3</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>V. Entrada L2-L3</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Amperaje L1</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Amperaje L2</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Amperaje L3</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Descarga PSI</label><input type="number" inputmode="numeric"></div>
       </div>
 
-      <!-- 🔥 BOMBA DIÉSEL -->
       <div class="section-title mt-8">Bomba Diésel</div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="input-group"><label>Nivel Agua/Aceite</label><input type="text"></div>
-        <div class="input-group"><label>Diesel (+¾ / -¾)</label><input type="text"></div>
-        <div class="input-group"><label>Presión Aceite PSI</label><input type="text"></div>
-        <div class="input-group"><label>Temperatura Inicial °C</label><input type="text"></div>
-        <div class="input-group"><label>Temperatura Final °C</label><input type="text"></div>
-        <div class="input-group"><label>Horas Inicial</label><input type="text"></div>
-        <div class="input-group"><label>Horas Final</label><input type="text"></div>
+        <div class="input-group"><label>Nivel Agua/Aceite</label><input type="text" inputmode="text"></div>
+        <div class="input-group"><label>Diesel (+¾ / -¾)</label><input type="text" inputmode="text"></div>
+        <div class="input-group"><label>Presión Aceite PSI</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Temperatura Inicial °C</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Temperatura Final °C</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Horas Inicial</label><input type="number" inputmode="numeric"></div>
+        <div class="input-group"><label>Horas Final</label><input type="number" inputmode="numeric"></div>
       </div>
-      <!-- 📸 EVIDENCIA FOTOGRÁFICA -->
       <div class="section-title mt-10">Evidencia Fotográfica</div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
@@ -167,62 +166,58 @@
           <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full">
         </div>
       </div>
-      <!-- ✍️ FIRMAS -->
       <div class="section-title mt-10">Firmas</div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
 
         <div>
           <label>Firma del Técnico</label>
-          <canvas id="firmaTecnico" width="300" height="150" style="border:1px solid #ccc; border-radius:8px;"></canvas>
+          <canvas id="firmaTecnico" width="300" height="150"></canvas>
+          <button class="btn btn-clear-signature" onclick="clearSignature('firmaTecnico')">Limpiar</button>
           <input type="text" id="nombreTecnicoFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del técnico">
         </div>
 
         <div>
           <label>Firma del Supervisor</label>
-          <canvas id="firmaSupervisor" width="300" height="150" style="border:1px solid #ccc; border-radius:8px;"></canvas>
+          <canvas id="firmaSupervisor" width="300" height="150"></canvas>
+          <button class="btn btn-clear-signature" onclick="clearSignature('firmaSupervisor')">Limpiar</button>
           <input type="text" id="nombreSupervisorFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del supervisor">
         </div>
       </div>
 
-      <!-- 📋 OBSERVACIONES -->
       <div class="section-title mt-10">Observaciones</div>
-      <textarea class="w-full h-24 p-3 border rounded mb-4" placeholder="Observaciones generales..."></textarea>
+      <textarea id="observaciones" class="w-full h-24 p-3 border rounded mb-4" placeholder="Observaciones generales..."></textarea>
 
-      <!-- BOTONES -->
       <div class="flex flex-col sm:flex-row gap-4 mt-4">
         <button id="pdfBtn" class="btn w-full sm:w-auto">Exportar a PDF</button>
         <button id="mailBtn" class="btn w-full sm:w-auto bg-green-600 hover:bg-green-700">Enviar por correo</button>
       </div>
-    </div> <!-- Cierre del cuerpo del reporte -->
-    <!-- 🧠 Scripts funcionales -->
-    <script>
+    </div> <script>
       const { jsPDF } = window.jspdf;
 
-      function obtenerUbicacion() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            pos => {
-              const lat = pos.coords.latitude.toFixed(5);
-              const lon = pos.coords.longitude.toFixed(5);
-              document.getElementById("lugar").value = `Lat: ${lat}, Lon: ${lon}`;
-            },
-            err => {
-              alert("No se pudo obtener la ubicación. Activa permisos de GPS.");
-            }
-          );
-        } else {
-          alert("Tu navegador no permite geolocalización.");
-        }
-      }
-
-      // Firma digital
+      // Función para inicializar canvas de firma
       function inicializarCanvasFirma(idCanvas) {
         const canvas = document.getElementById(idCanvas);
         const ctx = canvas.getContext("2d");
         let dibujando = false;
 
-        canvas.addEventListener("mousedown", () => dibujando = true);
-        canvas.addEventListener("mouseup", () => dibujando = false);
+        // Establecer el color de fondo del canvas (blanco) para html2canvas
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        canvas.addEventListener("mousedown", (e) => {
+          dibujando = true;
+          const rect = canvas.getBoundingClientRect();
+          ctx.beginPath();
+          ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        });
+        canvas.addEventListener("mouseup", () => {
+          dibujando = false;
+          ctx.closePath();
+        });
+        canvas.addEventListener("mouseout", () => { // Detener dibujo si el cursor sale del canvas
+          dibujando = false;
+          ctx.closePath();
+        });
         canvas.addEventListener("mousemove", e => {
           if (!dibujando) return;
           const rect = canvas.getBoundingClientRect();
@@ -231,41 +226,176 @@
           ctx.strokeStyle = "#111827";
           ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
           ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
         });
+
+        // Para dispositivos táctiles
+        canvas.addEventListener("touchstart", (e) => {
+          dibujando = true;
+          e.preventDefault(); // Evita el scroll
+          const rect = canvas.getBoundingClientRect();
+          const touch = e.touches[0];
+          ctx.beginPath();
+          ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        });
+        canvas.addEventListener("touchend", () => {
+          dibujando = false;
+          ctx.closePath();
+        });
+        canvas.addEventListener("touchcancel", () => {
+          dibujando = false;
+          ctx.closePath();
+        });
+        canvas.addEventListener("touchmove", (e) => {
+          if (!dibujando) return;
+          e.preventDefault(); // Evita el scroll
+          const rect = canvas.getBoundingClientRect();
+          const touch = e.touches[0];
+          ctx.lineWidth = 2;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = "#111827";
+          ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+          ctx.stroke();
+        });
+      }
+
+      function clearSignature(idCanvas) {
+        const canvas = document.getElementById(idCanvas);
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Volver a dibujar el fondo blanco
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
       inicializarCanvasFirma("firmaTecnico");
       inicializarCanvasFirma("firmaSupervisor");
 
+
+      // Obtener ubicación GPS (no un mapa interactivo)
+      function obtenerUbicacion() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            pos => {
+              const lat = pos.coords.latitude.toFixed(5);
+              const lon = pos.coords.longitude.toFixed(5);
+              document.getElementById("lugar").value = `Lat: ${lat}, Lon: ${lon}`;
+              alert("Ubicación obtenida por GPS.");
+            },
+            err => {
+              alert("No se pudo obtener la ubicación. Activa permisos de GPS y asegúrate de tener conexión.");
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
+            }
+          );
+        } else {
+          alert("Tu navegador no permite geolocalización.");
+        }
+      }
+
       // Exportar PDF
       document.getElementById("pdfBtn").addEventListener("click", () => {
-        html2canvas(document.querySelector(".max-w-5xl")).then(canvas => {
-          const imgData = canvas.toDataURL("image/png");
-          const pdf = new jsPDF("p", "mm", "a4");
-          const pageWidth = pdf.internal.pageSize.getWidth();
-          const pageHeight = pdf.internal.pageSize.getHeight();
-          const imgProps = pdf.getImageProperties(imgData);
-          const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+        const inputElements = document.querySelectorAll('input, textarea');
+        inputElements.forEach(input => {
+            input.style.border = 'none'; // Eliminar bordes para el PDF
+            input.style.backgroundColor = 'transparent'; // Eliminar fondo
+        });
 
-          pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pdfHeight);
-          pdf.save("RCI_reporte_servicio.pdf");
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.style.display = 'none'; // Ocultar botones
+        });
+
+        // Asegurarse de que el color de fondo del body sea blanco para la captura
+        document.body.style.backgroundColor = '#ffffff';
+
+        html2canvas(document.getElementById("reporteContent"), {
+            scale: 2, // Aumenta la resolución para mejor calidad del PDF
+            useCORS: true, // Importante si hay imágenes de diferentes orígenes (como firmas)
+            allowTaint: true, // Permitir contenido "tainted" (menos seguro pero a veces necesario)
+            logging: true, // Habilita el log para depuración
+            scrollX: 0, // Asegura que se captura desde el inicio del scroll
+            scrollY: 0,
+            windowWidth: document.documentElement.offsetWidth, // Captura el ancho completo de la ventana
+            windowHeight: document.documentElement.offsetHeight
+        }).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgProps = pdf.getImageProperties(imgData);
+
+            // Calcular el alto de la imagen en el PDF manteniendo el aspect ratio
+            const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+
+            let position = 0; // Posición vertical en el PDF
+
+            // Si la altura de la imagen es mayor que la altura de una página, se divide en varias páginas
+            if (pdfHeight > pageHeight) {
+                let currentPage = 1;
+                let remainingHeight = pdfHeight;
+
+                while (remainingHeight > 0) {
+                    pdf.addImage(imgData, "PNG", 0, position, pageWidth, pdfHeight);
+                    remainingHeight -= pageHeight;
+                    position -= pageHeight; // Mueve la posición para la siguiente "ventana" de la imagen
+                    if (remainingHeight > 0) {
+                        pdf.addPage();
+                        currentPage++;
+                    }
+                }
+            } else {
+                pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pdfHeight);
+            }
+
+            pdf.save("RCI_reporte_servicio.pdf");
+
+            // Restaurar estilos después de la exportación
+            inputElements.forEach(input => {
+                input.style.border = ''; // Restaurar borde
+                input.style.backgroundColor = ''; // Restaurar fondo
+            });
+            buttons.forEach(button => {
+                button.style.display = ''; // Restaurar visibilidad
+            });
+            document.body.style.backgroundColor = ''; // Restaurar color de fondo del body
+
+        }).catch(error => {
+            console.error("Error al generar PDF:", error);
+            alert("Hubo un error al generar el PDF. Por favor, revisa la consola para más detalles.");
+
+            // Asegurarse de restaurar los estilos incluso si hay un error
+            const inputElements = document.querySelectorAll('input, textarea');
+            inputElements.forEach(input => {
+                input.style.border = '';
+                input.style.backgroundColor = '';
+            });
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.style.display = '';
+            });
+            document.body.style.backgroundColor = '';
         });
       });
 
-      // Enviar correo
+      // Enviar correo (sin adjuntos, por limitación de mailto:)
       document.getElementById("mailBtn").addEventListener("click", () => {
         const lugar = document.getElementById("lugar").value;
         const tecnico = document.getElementById("tecnico").value;
         const fecha = document.getElementById("fecha").value;
-        const asunto = `Reporte técnico - ${fecha}`;
-        const cuerpo = `Lugar: ${lugar}\nTécnico: ${tecnico}\n\nSe adjunta el reporte generado.`;
+        const observaciones = document.getElementById("observaciones").value; // Capturar observaciones
+
+        const asunto = `Reporte Técnico RCI - ${fecha} - ${lugar}`;
+        const cuerpo = `Estimado(a),\n\nAdjunto el reporte técnico de servicios.\n\nDatos del Reporte:\nLugar: ${lugar}\nTécnico: ${tecnico}\nFecha: ${fecha}\n\nObservaciones: ${observaciones}\n\nSaludos cordiales,\nEquipo RCI Sistemas Contra Incendio`;
+
+        // El cliente de correo se abrirá con el asunto y cuerpo prellenados.
+        // Los adjuntos NO se pueden enviar directamente con mailto:.
         window.location.href = `mailto:rciadan2024@gmail.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
       });
     </script>
 
-    <!-- 📌 Pie de página institucional -->
     <div class="footer">
       <p class="text-sm">RCI México — Certificados NFPA</p>
     </div>
