@@ -5,8 +5,10 @@
   <title>RCI - Reporte Técnico de Servicios</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- jsPDF + html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -88,8 +90,8 @@
         background-color: #f9fafb; /* Ligeramente gris para que se vea el borde */
         touch-action: none; /* Previene el scroll en móviles al dibujar */
     }
-    /* Ocultar botones e inputs en el PDF */
-    .hide-on-pdf {
+    /* Nueva clase para ocultar elementos solo en la generación del PDF */
+    .pdf-exclude {
         display: none !important;
     }
   </style>
@@ -97,17 +99,20 @@
 <body>
   <div class="max-w-5xl mx-auto mt-6 shadow-xl bg-white rounded-xl overflow-hidden" id="reporteContent">
 
+    <!-- 🧢 Encabezado institucional -->
     <div class="header">
       <h1 class="text-3xl font-bold">RCI Sistemas Contra Incendio</h1>
     </div>
 
     <div class="px-6 py-4">
+      <!-- 🔧 DATOS GENERALES + UBICACIÓN -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div>
           <label for="lugar">📍 Lugar</label>
           <div class="flex gap-2 mt-1">
             <input type="text" id="lugar" class="border rounded px-3 py-2 w-full" placeholder="Ubicación" inputmode="text">
-            <button onclick="obtenerUbicacion()" class="btn hide-on-pdf">Ubicación GPS</button>
+            <!-- Botón de Ubicación GPS - ahora visible -->
+            <button onclick="obtenerUbicacion()" class="btn">Ubicación GPS</button>
           </div>
         </div>
         <div>
@@ -125,6 +130,7 @@
       </div>
 
       <div id="seccionBombas">
+        <!-- 🧯 BOMBA JOCKEY -->
         <div class="section-title">Bomba Jockey</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="input-group"><label>V. Entrada L1-L2</label><input type="number" inputmode="numeric"></div>
@@ -136,6 +142,7 @@
           <div class="input-group"><label>Descarga PSI</label><input type="number" inputmode="numeric"></div>
         </div>
 
+        <!-- ⚡ BOMBA ELÉCTRICA -->
         <div class="section-title mt-8">Bomba Eléctrica</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="input-group"><label>V. Entrada L1-L2</label><input type="number" inputmode="numeric"></div>
@@ -147,6 +154,7 @@
           <div class="input-group"><label>Descarga PSI</label><input type="number" inputmode="numeric"></div>
         </div>
 
+        <!-- 🔥 BOMBA DIÉSEL -->
         <div class="section-title mt-8">Bomba Diésel</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="input-group">
@@ -177,14 +185,23 @@
           <div class="input-group"><label>Horas Inicial</label><input type="number" inputmode="numeric"></div>
           <div class="input-group"><label>Horas Final</label><input type="number" inputmode="numeric"></div>
         </div>
-      </div><div id="seccionHidrantes">
+      </div><!-- /#seccionBombas -->
+
+      <!-- 💧 INSPECCIÓN DE HIDRANTES -->
+      <div id="seccionHidrantes">
         <div class="section-title mt-10">Inspección de Hidrantes</div>
         <div id="hidrantes-container">
-          </div>
-        <button onclick="agregarHidrante()" class="btn w-full sm:w-auto mt-4 hide-on-pdf">Agregar Otro Hidrante</button>
-      </div><div id="seccionFotos">
+          <!-- Los hidrantes se añadirán aquí dinámicamente -->
+        </div>
+        <!-- Botón para agregar hidrante - ahora visible -->
+        <button onclick="agregarHidrante()" class="btn w-full sm:w-auto mt-4">Agregar Otro Hidrante</button>
+      </div><!-- /#seccionHidrantes -->
+
+      <!-- 📸 EVIDENCIA FOTOGRÁFICA -->
+      <div id="seccionFotos">
         <div class="section-title mt-10">Evidencia Fotográfica</div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="photo-upload-container">
+          <!-- Las fotos se añadirán aquí -->
           <div class="input-group">
               <label>Foto 1</label>
               <input type="file" accept="image/*" class="border rounded px-3 py-2 w-full" data-photo-id="1">
@@ -222,33 +239,47 @@
               <img class="photo-preview mt-2 w-full h-32 object-cover hidden" src="" alt="Previsualización de Foto 6">
           </div>
         </div>
-      </div><div id="seccionFirmas">
+      </div><!-- /#seccionFotos -->
+
+      <!-- ✍️ FIRMAS -->
+      <div id="seccionFirmas">
         <div class="section-title mt-10">Firmas</div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
 
           <div>
             <label>Firma del Técnico</label>
             <canvas id="firmaTecnico" width="300" height="150"></canvas>
-            <button class="btn btn-clear-signature hide-on-pdf" onclick="clearSignature('firmaTecnico')">Limpiar</button>
+            <!-- Botón de limpiar firma - ahora visible -->
+            <button class="btn btn-clear-signature">Limpiar</button>
             <input type="text" id="nombreTecnicoFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del técnico">
           </div>
 
           <div>
             <label>Firma del Supervisor</label>
             <canvas id="firmaSupervisor" width="300" height="150"></canvas>
-            <button class="btn btn-clear-signature hide-on-pdf" onclick="clearSignature('firmaSupervisor')">Limpiar</button>
+            <!-- Botón de limpiar firma - ahora visible -->
+            <button class="btn btn-clear-signature">Limpiar</button>
             <input type="text" id="nombreSupervisorFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del supervisor">
           </div>
         </div>
-      </div><div id="seccionObservaciones">
+      </div><!-- /#seccionFirmas -->
+
+      <!-- 📋 OBSERVACIONES -->
+      <div id="seccionObservaciones">
         <div class="section-title mt-10">Observaciones</div>
         <textarea id="observaciones" class="w-full h-24 p-3 border rounded mb-4" placeholder="Observaciones generales..."></textarea>
-      </div><div class="flex flex-col sm:flex-row gap-4 mt-4 hide-on-pdf">
+      </div><!-- /#seccionObservaciones -->
+
+      <!-- BOTONES -->
+      <!-- Contenedor de botones - SIN la clase pdf-exclude -->
+      <div class="flex flex-col sm:flex-row gap-4 mt-4">
         <button id="pdfBtn" class="btn w-full sm:w-auto">Exportar a PDF</button>
         <button id="mailBtn" class="btn w-full sm:w-auto bg-green-600 hover:bg-green-700">Enviar por correo</button>
         <button id="whatsappBtn" class="btn w-full sm:w-auto bg-blue-600 hover:bg-blue-700">Compartir por WhatsApp</button>
       </div>
-    </div> <script>
+    </div> <!-- Cierre del cuerpo del reporte -->
+    <!-- 🧠 Scripts funcionales -->
+    <script>
       const { jsPDF } = window.jspdf;
       let hidranteCount = 0; // Contador para hidrantes
 
@@ -261,15 +292,30 @@
                   if (file) {
                       const reader = new FileReader();
                       reader.onload = function(e) {
-                          const imgPreview = input.nextElementSibling.nextElementSibling; // Asumiendo input -> photo-location -> photo-preview
-                          imgPreview.src = e.target.result;
-                          imgPreview.classList.remove('hidden');
-                      };
+                          // Encuentra el img.photo-preview asociado
+                          const imgPreview = this.closest('.input-group').querySelector('.photo-preview');
+                          if (imgPreview) {
+                              imgPreview.src = e.target.result;
+                              imgPreview.classList.remove('hidden');
+                          }
+                      }.bind(this); // Asegura que 'this' se refiera al input
                       reader.readAsDataURL(file);
                   } else {
-                      const imgPreview = input.nextElementSibling.nextElementSibling;
-                      imgPreview.src = '';
-                      imgPreview.classList.add('hidden');
+                      const imgPreview = this.closest('.input-group').querySelector('.photo-preview');
+                      if (imgPreview) {
+                          imgPreview.src = '';
+                          imgPreview.classList.add('hidden');
+                      }
+                  }
+              });
+          });
+
+          // Asignar eventos de limpieza a los botones "Limpiar" de firma
+          document.querySelectorAll('.btn-clear-signature').forEach(button => {
+              button.addEventListener('click', function() {
+                  const canvas = this.previousElementSibling; // El canvas es el elemento hermano anterior
+                  if (canvas && canvas.tagName === 'CANVAS') {
+                      clearSignature(canvas.id);
                   }
               });
           });
@@ -351,6 +397,7 @@
       inicializarCanvasFirma("firmaTecnico");
       inicializarCanvasFirma("firmaSupervisor");
 
+
       // Convertir coordenadas a ubicación y obtener ubicación GPS
       async function obtenerUbicacion() {
         document.getElementById("lugar").value = "Obteniendo ubicación...";
@@ -401,7 +448,7 @@
         hidranteCount++;
         const container = document.getElementById('hidrantes-container');
         const newHidranteDiv = document.createElement('div');
-        newHidranteDiv.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 hidrante-item'; // Added hidrante-item class
+        newHidranteDiv.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 hidrante-item';
         newHidranteDiv.innerHTML = `
           <div class="input-group">
             <label>Hidrante N° ${hidranteCount}</label>
@@ -418,9 +465,9 @@
       // Función para preparar y capturar una sección específica del DOM
       async function captureSection(elementId) {
           const element = document.getElementById(elementId);
-          // Ocultar botones e inputs solo si están dentro de la sección para el PDF
-          const elementsToHide = element.querySelectorAll('.hide-on-pdf');
-          elementsToHide.forEach(el => el.classList.add('hidden'));
+          // Ocultar elementos con la clase pdf-exclude dentro de la sección
+          const elementsToExclude = element.querySelectorAll('.pdf-exclude, input, textarea, button.btn-clear-signature');
+          elementsToExclude.forEach(el => el.classList.add('pdf-exclude')); // Asegurarse de que tengan la clase
 
           const canvas = await html2canvas(element, {
               scale: 2, // Aumenta la resolución
@@ -433,7 +480,7 @@
               windowHeight: element.scrollHeight,
           });
 
-          elementsToHide.forEach(el => el.classList.remove('hidden')); // Restaurar visibilidad
+          elementsToExclude.forEach(el => el.classList.remove('pdf-exclude')); // Restaurar visibilidad
           return canvas.toDataURL('image/png');
       }
 
@@ -446,21 +493,34 @@
 
         const contentWidth = pageWidth - 2 * margin;
 
-        // Ocultar todos los botones para la captura
-        document.querySelectorAll('.hide-on-pdf').forEach(btn => btn.classList.add('hidden'));
+        // Ocultar todos los elementos con la clase 'pdf-exclude' antes de la captura
+        document.querySelectorAll('.pdf-exclude').forEach(el => el.classList.add('hidden'));
+        // Ocultar inputs y textareas para que no tengan bordes en el PDF
+        document.querySelectorAll('input:not([type="file"]), textarea').forEach(el => {
+            el.style.border = 'none';
+            el.style.backgroundColor = 'transparent';
+        });
+        // Ocultar botones de limpiar firma
+        document.querySelectorAll('.btn-clear-signature').forEach(btn => btn.classList.add('hidden'));
+
+
         // Asegurarse de que el body tenga un fondo blanco para la captura
         document.body.style.backgroundColor = '#ffffff';
 
         let yOffset = margin;
 
-        // 1. Capturar y añadir la sección de datos generales
+        // 1. Capturar y añadir el encabezado y la sección de datos generales
+        const headerContent = document.querySelector('.header');
         const datosGenerales = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.gap-4.mb-6');
-        if (datosGenerales) {
+        if (headerContent && datosGenerales) {
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<div class="header" style="background-color: #1e40af; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;"><h1 class="text-3xl font-bold">RCI Sistemas Contra Incendio</h1></div>` + datosGenerales.outerHTML;
-            document.body.appendChild(tempDiv);
-            const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true, allowTaint: true });
-            document.body.removeChild(tempDiv);
+            tempDiv.style.width = '100%'; // Asegurar que ocupe el ancho completo para la captura
+            tempDiv.appendChild(headerContent.cloneNode(true));
+            tempDiv.appendChild(datosGenerales.cloneNode(true));
+            document.body.appendChild(tempDiv); // Añadir temporalmente al DOM para html2canvas
+
+            const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true, allowTaint: true, logging: false });
+            document.body.removeChild(tempDiv); // Remover del DOM
 
             const imgData = canvas.toDataURL('image/png');
             const imgProps = pdf.getImageProperties(imgData);
@@ -497,6 +557,7 @@
         // 4. Capturar y añadir la sección de Evidencia Fotográfica (imágenes reales)
         pdf.addPage(); // Siempre empezar fotos en una nueva página
         yOffset = margin;
+        pdf.setFontSize(14);
         pdf.text("Evidencia Fotográfica", margin, yOffset + 5);
         yOffset += 15; // Espacio después del título
 
@@ -532,47 +593,57 @@
             }
         }
 
+        // 5. Capturar y añadir las secciones de Firmas y Observaciones y el Footer
+        pdf.addPage(); // Siempre empezar firmas/observaciones en una nueva página
+        yOffset = margin;
 
-        // 5. Capturar y añadir las secciones de Firmas y Observaciones
-        const firmasObsTempDiv = document.createElement('div');
-        firmasObsTempDiv.id = "tempFirmasObs";
-        firmasObsTempDiv.innerHTML = document.getElementById('seccionFirmas').outerHTML + document.getElementById('seccionObservaciones').outerHTML + `<div class="footer" style="background-color: #1e3a8a; color: white; text-align: center; padding: 10px; margin-top: 40px; border-radius: 0 0 10px 10px;"><p class="text-sm">RCI México — Certificados NFPA</p></div>`;
-        document.body.appendChild(firmasObsTempDiv); // Añadir temporalmente al DOM para html2canvas
+        const firmasSection = document.getElementById('seccionFirmas');
+        const observacionesSection = document.getElementById('seccionObservaciones');
+        const footerContent = document.querySelector('.footer');
 
-        // Asegurarse de que los canvas de firma se capturen correctamente
-        const firmaTecnicoCanvas = firmasObsTempDiv.querySelector('#firmaTecnico');
-        const firmaSupervisorCanvas = firmasObsTempDiv.querySelector('#firmaSupervisor');
+        const tempFinalDiv = document.createElement('div');
+        tempFinalDiv.style.width = '100%';
+        tempFinalDiv.appendChild(firmasSection.cloneNode(true));
+        tempFinalDiv.appendChild(observacionesSection.cloneNode(true));
+        tempFinalDiv.appendChild(footerContent.cloneNode(true));
+        document.body.appendChild(tempFinalDiv);
+
+        // Asegurarse de que los canvas de firma se capturen correctamente en el tempDiv
+        const firmaTecnicoCanvasTemp = tempFinalDiv.querySelector('#firmaTecnico');
+        const firmaSupervisorCanvasTemp = tempFinalDiv.querySelector('#firmaSupervisor');
         const originalTecnicoCanvas = document.getElementById('firmaTecnico');
         const originalSupervisorCanvas = document.getElementById('firmaSupervisor');
 
-        if (originalTecnicoCanvas && firmaTecnicoCanvas) {
-            const ctxTecnico = firmaTecnicoCanvas.getContext('2d');
+        if (originalTecnicoCanvas && firmaTecnicoCanvasTemp) {
+            const ctxTecnico = firmaTecnicoCanvasTemp.getContext('2d');
             ctxTecnico.drawImage(originalTecnicoCanvas, 0, 0);
         }
-        if (originalSupervisorCanvas && firmaSupervisorCanvas) {
-            const ctxSupervisor = firmaSupervisorCanvas.getContext('2d');
+        if (originalSupervisorCanvas && firmaSupervisorCanvasTemp) {
+            const ctxSupervisor = firmaSupervisorCanvasTemp.getContext('2d');
             ctxSupervisor.drawImage(originalSupervisorCanvas, 0, 0);
         }
 
-
-        const firmasObsDataUrl = await html2canvas(firmasObsTempDiv, {
+        const finalSectionCanvas = await html2canvas(tempFinalDiv, {
             scale: 2, useCORS: true, allowTaint: true, logging: false
-        }).then(canvas => canvas.toDataURL('image/png'));
-        document.body.removeChild(firmasObsTempDiv); // Remover del DOM
+        });
+        document.body.removeChild(tempFinalDiv);
 
-        const firmasObsImgProps = pdf.getImageProperties(firmasObsDataUrl);
-        const firmasObsImgHeight = (firmasObsImgProps.height * contentWidth) / firmasObsImgProps.width;
+        const finalImgData = finalSectionCanvas.toDataURL('image/png');
+        const finalImgProps = pdf.getImageProperties(finalImgData);
+        const finalImgHeight = (finalImgProps.height * contentWidth) / finalImgProps.width;
 
-        if (yOffset + firmasObsImgHeight > pageHeight - margin) {
-            pdf.addPage();
-            yOffset = margin;
-        }
-        pdf.addImage(firmasObsDataUrl, 'PNG', margin, yOffset, contentWidth, firmasObsImgHeight);
+        pdf.addImage(finalImgData, 'PNG', margin, yOffset, contentWidth, finalImgHeight);
+
 
         pdf.save("RCI_reporte_servicio.pdf");
 
-        // Restaurar visibilidad de los botones
-        document.querySelectorAll('.hide-on-pdf').forEach(btn => btn.classList.remove('hidden'));
+        // Restaurar visibilidad de los elementos ocultos después de la exportación
+        document.querySelectorAll('.pdf-exclude').forEach(el => el.classList.remove('hidden'));
+        document.querySelectorAll('input:not([type="file"]), textarea').forEach(el => {
+            el.style.border = ''; /* Restaurar borde */
+            el.style.backgroundColor = ''; /* Restaurar fondo */
+        });
+        document.querySelectorAll('.btn-clear-signature').forEach(btn => btn.classList.remove('hidden'));
         document.body.style.backgroundColor = ''; // Restaurar color de fondo del body
       });
 
@@ -606,6 +677,7 @@
 
     </script>
 
+    <!-- 📌 Pie de página institucional -->
     <div class="footer">
       <p class="text-sm">RCI México — Certificados NFPA</p>
     </div>
