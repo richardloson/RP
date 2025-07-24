@@ -41,7 +41,7 @@
       color: #1e3a8a;
     }
     .input-group {
-      margin-bottom: 16px;
+      margin-bottom: 12px; /* Reducido para mayor compacidad */
     }
     label {
       font-weight: 600;
@@ -52,21 +52,22 @@
     input[type="number"],
     textarea {
       width: 100%;
-      padding: 10px;
+      padding: 8px; /* Reducido para mayor compacidad */
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      border-radius: 6px; /* Reducido para mayor compacidad */
       background-color: white;
     }
-    input[type="checkbox"] {
-        transform: scale(1.2); /* Agrandar un poco el checkbox */
-        margin-right: 8px;
+    input[type="checkbox"],
+    input[type="radio"] {
+        transform: scale(1.1); /* Ligeramente más pequeño para compacidad */
+        margin-right: 6px; /* Reducido */
     }
     .btn {
-      padding: 12px 24px;
+      padding: 10px 20px; /* Reducido para mayor compacidad */
       background-color: #2563eb;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px; /* Reducido */
       font-weight: bold;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
@@ -76,9 +77,9 @@
     }
     .btn-clear-signature {
         background-color: #ef4444;
-        margin-top: 8px;
-        font-size: 0.9em;
-        padding: 8px 16px;
+        margin-top: 6px; /* Reducido */
+        font-size: 0.85em; /* Ligeramente más pequeño */
+        padding: 6px 12px; /* Reducido */
     }
     .btn-clear-signature:hover {
         background-color: #dc2626;
@@ -86,13 +87,54 @@
     /* Estilo para el canvas de firma */
     canvas {
         border:1px solid #ccc;
-        border-radius:8px;
-        background-color: #f9fafb; /* Ligeramente gris para que se vea el borde */
-        touch-action: none; /* Previene el scroll en móviles al dibujar */
+        border-radius:6px; /* Reducido */
+        background-color: #f9fafb;
+        touch-action: none;
+        margin-top: 8px; /* Espacio para separar del input de nombre */
     }
-    /* Nueva clase para ocultar elementos solo en la generación del PDF */
-    .pdf-exclude {
+    /* Clase para ocultar elementos que no deben aparecer en el PDF */
+    .pdf-hidden {
         display: none !important;
+    }
+    /* Estilos para el texto de los inputs en el PDF */
+    .pdf-text-display {
+        display: block !important;
+        padding: 8px; /* Ajustado para consistencia */
+        border: 1px solid #cbd5e1;
+        border-radius: 6px; /* Ajustado para consistencia */
+        background-color: white;
+        color: #111827;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 1em;
+        font-weight: normal;
+        min-height: 38px; /* Ajustado para compacidad */
+        box-sizing: border-box;
+    }
+    /* Estilo para las fotos en el PDF */
+    .pdf-photo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px; /* Reducido */
+        margin-bottom: 16px; /* Reducido */
+    }
+    .pdf-photo-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .pdf-photo-item img {
+        width: 100%;
+        height: auto;
+        max-height: 100px; /* Reducido ligeramente para más compacidad */
+        object-fit: contain;
+        border: 1px solid #eee;
+        border-radius: 6px; /* Reducido */
+    }
+    .pdf-photo-item span {
+        font-size: 0.75em; /* Más pequeño */
+        color: #555;
+        margin-top: 3px; /* Reducido */
     }
   </style>
 </head>
@@ -100,28 +142,19 @@
   <div class="max-w-5xl mx-auto mt-6 shadow-xl bg-white rounded-xl overflow-hidden" id="reporteContent">
 
     <!-- 🧢 Encabezado institucional -->
-    <div class="header">
+    <div class="header" id="headerSection">
       <h1 class="text-3xl font-bold">RCI Sistemas Contra Incendio</h1>
     </div>
 
     <div class="px-6 py-4">
       <!-- 🔧 DATOS GENERALES + UBICACIÓN -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6" id="generalDataSection">
         <div>
           <label for="lugar">📍 Lugar</label>
           <div class="flex gap-2 mt-1">
             <input type="text" id="lugar" class="border rounded px-3 py-2 w-full" placeholder="Ubicación" inputmode="text">
-            <!-- Botón de Ubicación GPS - ahora visible -->
             <button onclick="obtenerUbicacion()" class="btn">Ubicación GPS</button>
           </div>
-        </div>
-        <div>
-          <label for="tecnico">👷 Técnico</label>
-          <input type="text" id="tecnico" class="border rounded px-3 py-2 w-full mt-1" placeholder="Nombre">
-        </div>
-        <div>
-          <label for="atiende">👤 Atiende</label>
-          <input type="text" id="atiende" class="border rounded px-3 py-2 w-full mt-1" placeholder="Responsable en sitio">
         </div>
         <div>
           <label for="fecha">📅 Fecha</label>
@@ -161,19 +194,22 @@
             <label>Nivel Agua</label>
             <div class="flex items-center mt-1">
                 <input type="text" inputmode="text" placeholder="Estado del nivel de agua">
-                <input type="checkbox" id="checkAguaOK" class="ml-2"> <label for="checkAguaOK" class="text-sm font-normal">OK</label>
+                <input type="checkbox" class="ml-2 nivel-check"> <label class="text-sm font-normal">OK</label>
             </div>
           </div>
           <div class="input-group">
             <label>Nivel Aceite</label>
             <div class="flex items-center mt-1">
                 <input type="text" inputmode="text" placeholder="Estado del nivel de aceite">
-                <input type="checkbox" id="checkAceiteOK" class="ml-2"> <label for="checkAceiteOK" class="text-sm font-normal">OK</label>
+                <input type="checkbox" class="ml-2 nivel-check"> <label class="text-sm font-normal">OK</label>
             </div>
           </div>
           <div class="input-group">
-            <label>Diesel (+¾ / -¾)</label>
-            <input type="text" inputmode="text" placeholder="Nivel de Diesel">
+            <label>Nivel Diesel</label>
+            <div class="flex items-center mt-1">
+                <input type="radio" name="nivelDiesel" value="+3/4" id="dieselPlus3_4" class="ml-2"> <label for="dieselPlus3_4" class="text-sm font-normal">+3/4</label>
+                <input type="radio" name="nivelDiesel" value="-3/4" id="dieselMinus3_4" class="ml-2"> <label for="dieselMinus3_4" class="text-sm font-normal">-3/4</label>
+            </div>
           </div>
           <div class="input-group">
             <label>Faltante de Litros (Diesel)</label>
@@ -193,7 +229,7 @@
         <div id="hidrantes-container">
           <!-- Los hidrantes se añadirán aquí dinámicamente -->
         </div>
-        <!-- Botón para agregar hidrante - ahora visible -->
+        <!-- Botón para agregar hidrante -->
         <button onclick="agregarHidrante()" class="btn w-full sm:w-auto mt-4">Agregar Otro Hidrante</button>
       </div><!-- /#seccionHidrantes -->
 
@@ -246,21 +282,25 @@
         <div class="section-title mt-10">Firmas</div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
 
-          <div>
-            <label>Firma del Técnico</label>
-            <canvas id="firmaTecnico" width="300" height="150"></canvas>
-            <!-- Botón de limpiar firma - ahora visible -->
+          <div class="flex flex-col items-center"> <!-- Contenedor flex para centrar -->
+            <label for="tecnico">👷 Técnico</label>
+            <input type="text" id="tecnico" class="border rounded px-3 py-2 w-full mt-1" placeholder="Nombre del Técnico">
+            <canvas id="firmaTecnico" width="300" height="150" class="mt-2"></canvas>
             <button class="btn btn-clear-signature">Limpiar</button>
-            <input type="text" id="nombreTecnicoFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del técnico">
+            <div id="displayNombreTecnico" class="text-center mt-2 font-semibold text-lg"></div>
           </div>
 
-          <div>
-            <label>Firma del Supervisor</label>
-            <canvas id="firmaSupervisor" width="300" height="150"></canvas>
-            <!-- Botón de limpiar firma - ahora visible -->
+          <div class="flex flex-col items-center"> <!-- Contenedor flex para centrar -->
+            <label for="atiende">👤 Atiende</label>
+            <input type="text" id="atiende" class="border rounded px-3 py-2 w-full mt-1" placeholder="Responsable en sitio">
+            <canvas id="firmaSupervisor" width="300" height="150" class="mt-2"></canvas>
             <button class="btn btn-clear-signature">Limpiar</button>
-            <input type="text" id="nombreSupervisorFirma" class="border rounded px-3 py-2 w-full mt-2" placeholder="Nombre del supervisor">
+            <div id="displayNombreSupervisor" class="text-center mt-2 font-semibold text-lg"></div>
           </div>
+        </div>
+        <div class="mt-4 flex items-center justify-center">
+            <input type="checkbox" id="autoFillNames" checked class="mr-2">
+            <label for="autoFillNames" class="font-semibold text-blue-800">Se queda todo en automático</label>
         </div>
       </div><!-- /#seccionFirmas -->
 
@@ -271,7 +311,6 @@
       </div><!-- /#seccionObservaciones -->
 
       <!-- BOTONES -->
-      <!-- Contenedor de botones - SIN la clase pdf-exclude -->
       <div class="flex flex-col sm:flex-row gap-4 mt-4">
         <button id="pdfBtn" class="btn w-full sm:w-auto">Exportar a PDF</button>
         <button id="mailBtn" class="btn w-full sm:w-auto bg-green-600 hover:bg-green-700">Enviar por correo</button>
@@ -283,8 +322,35 @@
       const { jsPDF } = window.jspdf;
       let hidranteCount = 0; // Contador para hidrantes
 
+      // Función para actualizar los nombres mostrados bajo las firmas
+      function updateDisplayedNames() {
+          const autoFillCheckbox = document.getElementById('autoFillNames');
+          const tecnicoInput = document.getElementById('tecnico');
+          const atiendeInput = document.getElementById('atiende');
+          const displayTecnico = document.getElementById('displayNombreTecnico');
+          const displaySupervisor = document.getElementById('displayNombreSupervisor');
+
+          if (autoFillCheckbox.checked) {
+              displayTecnico.textContent = tecnicoInput.value || '';
+              displaySupervisor.textContent = atiendeInput.value || '';
+          } else {
+              displayTecnico.textContent = '';
+              displaySupervisor.textContent = '';
+          }
+      }
+
       document.addEventListener('DOMContentLoaded', () => {
           agregarHidrante(); // Añadir el primer hidrante al cargar la página
+
+          // Inicializar los nombres mostrados
+          updateDisplayedNames();
+
+          // Escuchar cambios en los campos de Técnico y Atiende para actualizar los nombres mostrados
+          document.getElementById('tecnico').addEventListener('input', updateDisplayedNames);
+          document.getElementById('atiende').addEventListener('input', updateDisplayedNames);
+          // Escuchar cambios en el checkbox "Se queda todo en automático"
+          document.getElementById('autoFillNames').addEventListener('change', updateDisplayedNames);
+
           // Previsualización de imágenes
           document.querySelectorAll('input[type="file"]').forEach(input => {
               input.addEventListener('change', function(event) {
@@ -292,13 +358,12 @@
                   if (file) {
                       const reader = new FileReader();
                       reader.onload = function(e) {
-                          // Encuentra el img.photo-preview asociado
                           const imgPreview = this.closest('.input-group').querySelector('.photo-preview');
                           if (imgPreview) {
                               imgPreview.src = e.target.result;
                               imgPreview.classList.remove('hidden');
                           }
-                      }.bind(this); // Asegura que 'this' se refiera al input
+                      }.bind(this);
                       reader.readAsDataURL(file);
                   } else {
                       const imgPreview = this.closest('.input-group').querySelector('.photo-preview');
@@ -313,7 +378,7 @@
           // Asignar eventos de limpieza a los botones "Limpiar" de firma
           document.querySelectorAll('.btn-clear-signature').forEach(button => {
               button.addEventListener('click', function() {
-                  const canvas = this.previousElementSibling; // El canvas es el elemento hermano anterior
+                  const canvas = this.previousElementSibling;
                   if (canvas && canvas.tagName === 'CANVAS') {
                       clearSignature(canvas.id);
                   }
@@ -327,7 +392,6 @@
         const ctx = canvas.getContext("2d");
         let dibujando = false;
 
-        // Establecer el color de fondo del canvas (blanco) para html2canvas
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -341,7 +405,7 @@
           dibujando = false;
           ctx.closePath();
         });
-        canvas.addEventListener("mouseout", () => { // Detener dibujo si el cursor sale del canvas
+        canvas.addEventListener("mouseout", () => {
           dibujando = false;
           ctx.closePath();
         });
@@ -355,10 +419,9 @@
           ctx.stroke();
         });
 
-        // Para dispositivos táctiles
         canvas.addEventListener("touchstart", (e) => {
           dibujando = true;
-          e.preventDefault(); // Evita el scroll
+          e.preventDefault();
           const rect = canvas.getBoundingClientRect();
           const touch = e.touches[0];
           ctx.beginPath();
@@ -374,7 +437,7 @@
         });
         canvas.addEventListener("touchmove", (e) => {
           if (!dibujando) return;
-          e.preventDefault(); // Evita el scroll
+          e.preventDefault();
           const rect = canvas.getBoundingClientRect();
           const touch = e.touches[0];
           ctx.lineWidth = 2;
@@ -389,14 +452,12 @@
         const canvas = document.getElementById(idCanvas);
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Volver a dibujar el fondo blanco
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
       inicializarCanvasFirma("firmaTecnico");
       inicializarCanvasFirma("firmaSupervisor");
-
 
       // Convertir coordenadas a ubicación y obtener ubicación GPS
       async function obtenerUbicacion() {
@@ -409,7 +470,6 @@
               const lugarInput = document.getElementById("lugar");
 
               try {
-                // Usar Nominatim para geocodificación inversa
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
                 const data = await response.json();
 
@@ -452,7 +512,9 @@
         newHidranteDiv.innerHTML = `
           <div class="input-group">
             <label>Hidrante N° ${hidranteCount}</label>
-            <input type="text" class="w-full" placeholder="Identificador del hidrante (ej. H-01)">
+            <div class="flex items-center mt-1">
+                <input type="checkbox" class="ml-2 hidrante-check"> <label class="text-sm font-normal">OK</label>
+            </div>
           </div>
           <div class="input-group">
             <label>Comentarios Hidrante N° ${hidranteCount}</label>
@@ -462,26 +524,67 @@
         container.appendChild(newHidranteDiv);
       }
 
-      // Función para preparar y capturar una sección específica del DOM
-      async function captureSection(elementId) {
-          const element = document.getElementById(elementId);
-          // Ocultar elementos con la clase pdf-exclude dentro de la sección
-          const elementsToExclude = element.querySelectorAll('.pdf-exclude, input, textarea, button.btn-clear-signature');
-          elementsToExclude.forEach(el => el.classList.add('pdf-exclude')); // Asegurarse de que tengan la clase
+      // Helper para preparar un elemento para la captura (reemplazar inputs con texto, etc.)
+      function prepareElementForCapture(originalElement) {
+          const clonedElement = originalElement.cloneNode(true);
 
-          const canvas = await html2canvas(element, {
-              scale: 2, // Aumenta la resolución
-              useCORS: true,
-              allowTaint: true,
-              logging: false,
-              scrollX: 0,
-              scrollY: 0,
-              windowWidth: element.scrollWidth,
-              windowHeight: element.scrollHeight,
+          // Ocultar botones y elementos que no deben ir en el PDF
+          clonedElement.querySelectorAll('.btn, input[type="file"], .btn-clear-signature').forEach(el => el.remove());
+
+          // Reemplazar input/textarea con span que contenga el valor y aplicar estilos para PDF
+          clonedElement.querySelectorAll('input:not([type="file"]):not([type="checkbox"]):not([type="radio"]), textarea').forEach(input => {
+              const span = document.createElement('span');
+              span.textContent = input.value || '';
+              span.className = 'pdf-text-display'; // Aplicar estilos para el PDF
+              input.parentNode.replaceChild(span, input);
           });
 
-          elementsToExclude.forEach(el => el.classList.remove('pdf-exclude')); // Restaurar visibilidad
-          return canvas.toDataURL('image/png');
+          // Manejar checkboxes y radio buttons: mostrar su estado como texto
+          clonedElement.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {
+              const span = document.createElement('span');
+              if (input.type === 'checkbox') {
+                  // Específicamente para el checkbox de autoFillNames
+                  if (input.id === 'autoFillNames') {
+                      span.textContent = `Se queda todo en automático: ${input.checked ? '[X] Sí' : '[ ] No'}`;
+                      span.className = 'font-semibold text-blue-800'; // Mantener estilo
+                      // Eliminar el label asociado si existe
+                      const associatedLabel = clonedElement.querySelector(`label[for="${input.id}"]`);
+                      if (associatedLabel) associatedLabel.remove();
+                  } else {
+                      span.textContent = input.checked ? ' [X] OK' : ' [ ] NO OK';
+                  }
+              } else if (input.type === 'radio') {
+                  if (input.checked) {
+                      span.textContent = ` [X] ${input.value}`;
+                  } else {
+                      span.textContent = '';
+                  }
+              }
+              span.style.marginLeft = '8px';
+              span.style.fontWeight = 'normal';
+              span.style.color = '#111827';
+              // Reemplazar el input radio/checkbox y su label asociado (si no es autoFillNames)
+              if (input.id !== 'autoFillNames' && input.nextElementSibling && input.nextElementSibling.tagName === 'LABEL') {
+                  input.nextElementSibling.remove();
+              }
+              input.parentNode.replaceChild(span, input);
+          });
+
+          // Para los canvas de firma, dibujar el contenido del original en el clon
+          clonedElement.querySelectorAll('canvas').forEach(clonedCanvas => {
+              const originalCanvas = document.getElementById(clonedCanvas.id);
+              if (originalCanvas) {
+                  const ctx = clonedCanvas.getContext('2d');
+                  ctx.drawImage(originalCanvas, 0, 0);
+                  // Asegurar fondo blanco para la captura
+                  ctx.globalCompositeOperation = 'destination-over';
+                  ctx.fillStyle = '#ffffff';
+                  ctx.fillRect(0, 0, clonedCanvas.width, clonedCanvas.height);
+                  ctx.globalCompositeOperation = 'source-over';
+              }
+          });
+
+          return clonedElement;
       }
 
       // Exportar PDF
@@ -490,189 +593,291 @@
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
         const margin = 10; // Margen de 10mm en cada lado
-
         const contentWidth = pageWidth - 2 * margin;
-
-        // Ocultar todos los elementos con la clase 'pdf-exclude' antes de la captura
-        document.querySelectorAll('.pdf-exclude').forEach(el => el.classList.add('hidden'));
-        // Ocultar inputs y textareas para que no tengan bordes en el PDF
-        document.querySelectorAll('input:not([type="file"]), textarea').forEach(el => {
-            el.style.border = 'none';
-            el.style.backgroundColor = 'transparent';
-        });
-        // Ocultar botones de limpiar firma
-        document.querySelectorAll('.btn-clear-signature').forEach(btn => btn.classList.add('hidden'));
-
 
         // Asegurarse de que el body tenga un fondo blanco para la captura
         document.body.style.backgroundColor = '#ffffff';
 
         let yOffset = margin;
 
-        // 1. Capturar y añadir el encabezado y la sección de datos generales
-        const headerContent = document.querySelector('.header');
-        const datosGenerales = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.gap-4.mb-6');
-        if (headerContent && datosGenerales) {
-            const tempDiv = document.createElement('div');
-            tempDiv.style.width = '100%'; // Asegurar que ocupe el ancho completo para la captura
-            tempDiv.appendChild(headerContent.cloneNode(true));
-            tempDiv.appendChild(datosGenerales.cloneNode(true));
-            document.body.appendChild(tempDiv); // Añadir temporalmente al DOM para html2canvas
+        try {
+            // 1. Sección de Encabezado y Datos Generales
+            const headerAndGeneralData = document.createElement('div');
+            headerAndGeneralData.appendChild(document.getElementById('headerSection').cloneNode(true));
+            const generalDataSectionClone = document.getElementById('generalDataSection').cloneNode(true);
+            headerAndGeneralData.appendChild(generalDataSectionClone);
 
-            const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true, allowTaint: true, logging: false });
-            document.body.removeChild(tempDiv); // Remover del DOM
+            const preparedHeaderAndGeneralData = prepareElementForCapture(headerAndGeneralData);
+            document.body.appendChild(preparedHeaderAndGeneralData);
 
-            const imgData = canvas.toDataURL('image/png');
-            const imgProps = pdf.getImageProperties(imgData);
-            const imgHeight = (imgProps.height * contentWidth) / imgProps.width;
+            const canvasHeaderGeneral = await html2canvas(preparedHeaderAndGeneralData, { scale: 2, useCORS: true, allowTaint: true, logging: false });
+            document.body.removeChild(preparedHeaderAndGeneralData);
 
-            pdf.addImage(imgData, 'PNG', margin, yOffset, contentWidth, imgHeight);
-            yOffset += imgHeight + margin; // Espacio después de la sección
-        }
+            const imgDataHeaderGeneral = canvasHeaderGeneral.toDataURL('image/png');
+            const imgPropsHeaderGeneral = pdf.getImageProperties(imgDataHeaderGeneral);
+            
+            // Validate dimensions before adding image
+            if (imgPropsHeaderGeneral.width === 0 || imgPropsHeaderGeneral.height === 0) {
+                console.error("Error: Header/General section captured with zero dimensions. Skipping this section.");
+            } else {
+                const imgHeightHeaderGeneral = (imgPropsHeaderGeneral.height * contentWidth) / imgPropsHeaderGeneral.width;
+                pdf.addImage(imgDataHeaderGeneral, 'PNG', margin, yOffset, contentWidth, imgHeightHeaderGeneral);
+                yOffset += imgHeightHeaderGeneral + margin;
+            }
 
-        // 2. Capturar y añadir la sección de Bombas
-        const bombasDataUrl = await captureSection('seccionBombas');
-        const bombasImgProps = pdf.getImageProperties(bombasDataUrl);
-        const bombasImgHeight = (bombasImgProps.height * contentWidth) / bombasImgProps.width;
+            // 2. Sección de Bombas
+            const preparedBombas = prepareElementForCapture(document.getElementById('seccionBombas'));
+            document.body.appendChild(preparedBombas);
+            const canvasBombas = await html2canvas(preparedBombas, { scale: 2, useCORS: true, allowTaint: true, logging: false });
+            document.body.removeChild(preparedBombas);
 
-        if (yOffset + bombasImgHeight > pageHeight - margin) { // Si no cabe en la página actual
-            pdf.addPage();
-            yOffset = margin;
-        }
-        pdf.addImage(bombasDataUrl, 'PNG', margin, yOffset, contentWidth, bombasImgHeight);
-        yOffset += bombasImgHeight + margin;
+            const imgDataBombas = canvasBombas.toDataURL('image/png');
+            const imgPropsBombas = pdf.getImageProperties(imgDataBombas);
 
-        // 3. Capturar y añadir la sección de Hidrantes
-        const hidrantesDataUrl = await captureSection('seccionHidrantes');
-        const hidrantesImgProps = pdf.getImageProperties(hidrantesDataUrl);
-        const hidrantesImgHeight = (hidrantesImgProps.height * contentWidth) / hidrantesImgProps.width;
+            // Validate dimensions before adding image
+            if (imgPropsBombas.width === 0 || imgPropsBombas.height === 0) {
+                console.error("Error: Bombas section captured with zero dimensions. Skipping this section.");
+            } else {
+                const imgHeightBombas = (imgPropsBombas.height * contentWidth) / imgPropsBombas.width;
 
-        if (yOffset + hidrantesImgHeight > pageHeight - margin) {
-            pdf.addPage();
-            yOffset = margin;
-        }
-        pdf.addImage(hidrantesDataUrl, 'PNG', margin, yOffset, contentWidth, hidrantesImgHeight);
-        yOffset += hidrantesImgHeight + margin;
-
-        // 4. Capturar y añadir la sección de Evidencia Fotográfica (imágenes reales)
-        pdf.addPage(); // Siempre empezar fotos en una nueva página
-        yOffset = margin;
-        pdf.setFontSize(14);
-        pdf.text("Evidencia Fotográfica", margin, yOffset + 5);
-        yOffset += 15; // Espacio después del título
-
-        const photoContainer = document.getElementById('photo-upload-container');
-        const photoPreviews = photoContainer.querySelectorAll('.photo-preview:not(.hidden)');
-        const photoLocations = photoContainer.querySelectorAll('.photo-location');
-
-        for (let i = 0; i < photoPreviews.length; i++) {
-            const imgPreview = photoPreviews[i];
-            const locationInput = photoLocations[i];
-
-            if (imgPreview.src && imgPreview.src !== window.location.href) { // Asegurarse de que haya una imagen cargada
-                const imgProps = pdf.getImageProperties(imgPreview.src);
-                let imgHeight = (imgProps.height * contentWidth) / imgProps.width;
-                const maxImgHeight = (pageHeight - margin * 2) / 3; // Límite para 3 fotos por página
-                if (imgHeight > maxImgHeight) imgHeight = maxImgHeight;
-
-                if (yOffset + imgHeight + 10 > pageHeight - margin) { // 10 para el texto de la ubicación
+                if (yOffset + imgHeightBombas > pageHeight - margin) {
                     pdf.addPage();
                     yOffset = margin;
                 }
-                pdf.addImage(imgPreview.src, 'PNG', margin, yOffset, contentWidth, imgHeight);
-                yOffset += imgHeight + 5; // Espacio después de la imagen
+                pdf.addImage(imgDataBombas, 'PNG', margin, yOffset, contentWidth, imgHeightBombas);
+                yOffset += imgHeightBombas + margin;
+            }
 
-                // Añadir texto de ubicación de la foto
-                if (locationInput.value) {
-                    pdf.setFontSize(10);
-                    pdf.text(`Ubicación: ${locationInput.value}`, margin, yOffset);
-                    yOffset += 10; // Espacio después del texto
-                } else {
-                    yOffset += 5; // Espacio extra si no hay ubicación
+            // 3. Sección de Hidrantes
+            const preparedHidrantes = prepareElementForCapture(document.getElementById('seccionHidrantes'));
+            document.body.appendChild(preparedHidrantes);
+            const canvasHidrantes = await html2canvas(preparedHidrantes, { scale: 2, useCORS: true, allowTaint: true, logging: false });
+            document.body.removeChild(preparedHidrantes);
+
+            const imgDataHidrantes = canvasHidrantes.toDataURL('image/png');
+            const imgPropsHidrantes = pdf.getImageProperties(imgDataHidrantes);
+
+            // Validate dimensions before adding image
+            if (imgPropsHidrantes.width === 0 || imgPropsHidrantes.height === 0) {
+                console.error("Error: Hidrantes section captured with zero dimensions. Skipping this section.");
+            } else {
+                const imgHeightHidrantes = (imgPropsHidrantes.height * contentWidth) / imgPropsHidrantes.width;
+
+                if (yOffset + imgHeightHidrantes > pageHeight - margin) {
+                    pdf.addPage();
+                    yOffset = margin;
+                }
+                pdf.addImage(imgDataHidrantes, 'PNG', margin, yOffset, contentWidth, imgHeightHidrantes);
+                yOffset += imgHeightHidrantes + margin;
+            }
+
+            // 4. Sección de Evidencia Fotográfica
+            pdf.addPage();
+            yOffset = margin;
+            pdf.setFontSize(14);
+            pdf.text("Evidencia Fotográfica", margin, yOffset + 5);
+            yOffset += 15;
+
+            const photoContainer = document.getElementById('photo-upload-container');
+            const photoGroups = photoContainer.querySelectorAll('.input-group');
+
+            const photoColWidth = (contentWidth - 10) / 2; // Ancho para 2 columnas con 10mm de espacio entre ellas
+            const photoMaxCellHeight = 120; // Altura máxima para cada celda de foto (ajustable)
+            let currentColumn = 0;
+            let currentPhotoYOffset = yOffset;
+
+            for (const group of photoGroups) {
+                const imgPreview = group.querySelector('.photo-preview');
+                const locationInput = group.querySelector('.photo-location');
+
+                if (imgPreview && imgPreview.src && imgPreview.src !== window.location.href && !imgPreview.classList.contains('hidden')) {
+                    const imgData = imgPreview.src;
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const aspectRatio = imgProps.width / imgProps.height;
+                    
+                    let imgPdfWidth = photoColWidth;
+                    let imgPdfHeight = imgPdfWidth / aspectRatio;
+
+                    // Escalar la imagen para que quepa dentro de la altura máxima de la celda
+                    if (imgPdfHeight > photoMaxCellHeight - 20) { // 20mm para el texto de la ubicación y padding
+                        imgPdfHeight = photoMaxCellHeight - 20;
+                        imgPdfWidth = imgPdfHeight * aspectRatio;
+                    }
+
+                    let xPos = margin + (currentColumn * (photoColWidth + 10)); // 10mm de gap
+
+                    // Si la imagen actual no cabe en la fila actual, o si es la 3ra columna, avanzar a la siguiente fila
+                    if (currentColumn >= 2) {
+                        currentColumn = 0;
+                        currentPhotoYOffset += photoMaxCellHeight; // Mover a la siguiente fila
+                    }
+
+                    // Si no hay espacio en la página para la siguiente fila, añadir una nueva página
+                    if (currentPhotoYOffset + photoMaxCellHeight > pageHeight - margin) {
+                        pdf.addPage();
+                        currentPhotoYOffset = margin;
+                        yOffset = margin; // Reset yOffset para la sección
+                        pdf.setFontSize(14);
+                        pdf.text("Evidencia Fotográfica (continuación)", margin, yOffset + 5);
+                        currentPhotoYOffset += 15;
+                    }
+
+                    // Centrar imagen en su celda
+                    pdf.addImage(imgData, 'PNG', xPos + (photoColWidth - imgPdfWidth) / 2, currentPhotoYOffset + 5, imgPdfWidth, imgPdfHeight); // +5 para padding superior
+
+                    // Añadir texto de ubicación de la foto
+                    if (locationInput && locationInput.value) {
+                        pdf.setFontSize(8); // Tamaño de fuente más pequeño para ubicación
+                        const textLines = pdf.splitTextToSize(`Ubicación: ${locationInput.value}`, photoColWidth - 4); // -4 para padding
+                        pdf.text(textLines, xPos + 2, currentPhotoYOffset + imgPdfHeight + 10); // +10 para espacio después de imagen
+                    }
+                    
+                    currentColumn++;
                 }
             }
+            yOffset = currentPhotoYOffset + photoMaxCellHeight + margin; // Actualizar yOffset general para la siguiente sección
+
+            // 5. Sección de Firmas, Observaciones y Footer
+            pdf.addPage();
+            yOffset = margin;
+
+            const firmasObsFooter = document.createElement('div');
+            firmasObsFooter.appendChild(document.getElementById('seccionFirmas').cloneNode(true));
+            firmasObsFooter.appendChild(document.getElementById('seccionObservaciones').cloneNode(true));
+            firmasObsFooter.appendChild(document.querySelector('.footer').cloneNode(true));
+            
+            const preparedFirmasObsFooter = prepareElementForCapture(firmasObsFooter);
+            document.body.appendChild(preparedFirmasObsFooter);
+
+            const canvasFirmasObsFooter = await html2canvas(preparedFirmasObsFooter, { scale: 2, useCORS: true, allowTaint: true, logging: false });
+            document.body.removeChild(preparedFirmasObsFooter);
+
+            const imgDataFirmasObsFooter = canvasFirmasObsFooter.toDataURL('image/png');
+            const imgPropsFirmasObsFooter = pdf.getImageProperties(imgDataFirmasObsFooter);
+            
+            // Validate dimensions before adding image
+            if (imgPropsFirmasObsFooter.width === 0 || imgPropsFirmasObsFooter.height === 0) {
+                console.error("Error: Firmas/Observaciones/Footer section captured with zero dimensions. Skipping this section.");
+            } else {
+                const imgHeightFirmasObsFooter = (imgPropsFirmasObsFooter.height * contentWidth) / imgPropsFirmasObsFooter.width;
+                pdf.addImage(imgDataFirmasObsFooter, 'PNG', margin, yOffset, contentWidth, imgHeightFirmasObsFooter);
+            }
+
+            pdf.save("RCI_reporte_servicio.pdf");
+
+        } catch (error) {
+            console.error("Error al generar el PDF:", error);
+            alert("Hubo un error al generar el PDF. Por favor, revisa la consola para más detalles.");
+        } finally {
+            // Asegurarse de restaurar el color de fondo del body incluso si hay un error
+            document.body.style.backgroundColor = '';
         }
-
-        // 5. Capturar y añadir las secciones de Firmas y Observaciones y el Footer
-        pdf.addPage(); // Siempre empezar firmas/observaciones en una nueva página
-        yOffset = margin;
-
-        const firmasSection = document.getElementById('seccionFirmas');
-        const observacionesSection = document.getElementById('seccionObservaciones');
-        const footerContent = document.querySelector('.footer');
-
-        const tempFinalDiv = document.createElement('div');
-        tempFinalDiv.style.width = '100%';
-        tempFinalDiv.appendChild(firmasSection.cloneNode(true));
-        tempFinalDiv.appendChild(observacionesSection.cloneNode(true));
-        tempFinalDiv.appendChild(footerContent.cloneNode(true));
-        document.body.appendChild(tempFinalDiv);
-
-        // Asegurarse de que los canvas de firma se capturen correctamente en el tempDiv
-        const firmaTecnicoCanvasTemp = tempFinalDiv.querySelector('#firmaTecnico');
-        const firmaSupervisorCanvasTemp = tempFinalDiv.querySelector('#firmaSupervisor');
-        const originalTecnicoCanvas = document.getElementById('firmaTecnico');
-        const originalSupervisorCanvas = document.getElementById('firmaSupervisor');
-
-        if (originalTecnicoCanvas && firmaTecnicoCanvasTemp) {
-            const ctxTecnico = firmaTecnicoCanvasTemp.getContext('2d');
-            ctxTecnico.drawImage(originalTecnicoCanvas, 0, 0);
-        }
-        if (originalSupervisorCanvas && firmaSupervisorCanvasTemp) {
-            const ctxSupervisor = firmaSupervisorCanvasTemp.getContext('2d');
-            ctxSupervisor.drawImage(originalSupervisorCanvas, 0, 0);
-        }
-
-        const finalSectionCanvas = await html2canvas(tempFinalDiv, {
-            scale: 2, useCORS: true, allowTaint: true, logging: false
-        });
-        document.body.removeChild(tempFinalDiv);
-
-        const finalImgData = finalSectionCanvas.toDataURL('image/png');
-        const finalImgProps = pdf.getImageProperties(finalImgData);
-        const finalImgHeight = (finalImgProps.height * contentWidth) / finalImgProps.width;
-
-        pdf.addImage(finalImgData, 'PNG', margin, yOffset, contentWidth, finalImgHeight);
-
-
-        pdf.save("RCI_reporte_servicio.pdf");
-
-        // Restaurar visibilidad de los elementos ocultos después de la exportación
-        document.querySelectorAll('.pdf-exclude').forEach(el => el.classList.remove('hidden'));
-        document.querySelectorAll('input:not([type="file"]), textarea').forEach(el => {
-            el.style.border = ''; /* Restaurar borde */
-            el.style.backgroundColor = ''; /* Restaurar fondo */
-        });
-        document.querySelectorAll('.btn-clear-signature').forEach(btn => btn.classList.remove('hidden'));
-        document.body.style.backgroundColor = ''; // Restaurar color de fondo del body
       });
-
 
       // Enviar correo (sin adjuntos, por limitación de mailto:)
       document.getElementById("mailBtn").addEventListener("click", () => {
         const lugar = document.getElementById("lugar").value;
         const tecnico = document.getElementById("tecnico").value;
         const fecha = document.getElementById("fecha").value;
-        const observaciones = document.getElementById("observaciones").value; // Capturar observaciones
+        const observaciones = document.getElementById("observaciones").value;
 
         const asunto = `Reporte Técnico RCI - ${fecha} - ${lugar}`;
         const cuerpo = `Estimado(a),\n\nAdjunto el reporte técnico de servicios.\n\nDatos del Reporte:\nLugar: ${lugar}\nTécnico: ${tecnico}\nFecha: ${fecha}\n\nObservaciones: ${observaciones}\n\nSaludos cordiales,\nEquipo RCI Sistemas Contra Incendio`;
 
-        // El cliente de correo se abrirá con el asunto y cuerpo prellenados.
-        // Los adjuntos NO se pueden enviar directamente con mailto:.
         window.location.href = `mailto:rciadan2024@gmail.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
       });
 
+      // Función para recopilar todos los datos del formulario como texto
+      function gatherFormDataAsText() {
+          let reportText = "--- Reporte Técnico de Servicios RCI ---\n\n";
+
+          // Datos Generales
+          reportText += "🔧 DATOS GENERALES:\n";
+          reportText += `Lugar: ${document.getElementById('lugar').value || 'N/A'}\n`;
+          reportText += `Fecha: ${document.getElementById('fecha').value || 'N/A'}\n\n`;
+
+          // Bombas
+          reportText += "--- Información de Bombas ---\n\n";
+          reportText += "🧯 BOMBA JOCKEY:\n";
+          document.querySelectorAll('#seccionBombas .grid:nth-of-type(1) .input-group').forEach(group => {
+              const label = group.querySelector('label').textContent;
+              const input = group.querySelector('input');
+              if (input) reportText += `${label}: ${input.value || 'N/A'}\n`;
+          });
+          reportText += "\n⚡ BOMBA ELÉCTRICA:\n";
+          document.querySelectorAll('#seccionBombas .grid:nth-of-type(2) .input-group').forEach(group => {
+              const label = group.querySelector('label').textContent;
+              const input = group.querySelector('input');
+              if (input) reportText += `${label}: ${input.value || 'N/A'}\n`;
+          });
+          reportText += "\n🔥 BOMBA DIÉSEL:\n";
+          document.querySelectorAll('#seccionBombas .grid:nth-of-type(3) .input-group').forEach(group => {
+              const label = group.querySelector('label').textContent;
+              if (label.includes('Nivel Diesel')) {
+                  const selectedRadio = group.querySelector('input[name="nivelDiesel"]:checked');
+                  reportText += `${label}: ${selectedRadio ? selectedRadio.value : 'N/A'}\n`;
+              } else {
+                  const input = group.querySelector('input:not([type="checkbox"]):not([type="radio"])');
+                  const checkbox = group.querySelector('input[type="checkbox"]');
+                  if (input) {
+                      let value = input.value || 'N/A';
+                      if (checkbox) value += (checkbox.checked ? ' (OK)' : ' (NO OK)');
+                      reportText += `${label}: ${value}\n`;
+                  }
+              }
+          });
+          reportText += "\n";
+
+          // Hidrantes
+          reportText += "--- Inspección de Hidrantes ---\n\n";
+          document.querySelectorAll('#hidrantes-container .hidrante-item').forEach((item, index) => {
+              const commentsTextarea = item.querySelector('textarea');
+              const check = item.querySelector('.hidrante-check');
+
+              reportText += `💧 Hidrante N° ${index + 1}: `;
+              reportText += check && check.checked ? ' (OK)\n' : ' (NO OK)\n';
+              reportText += `Comentarios: ${commentsTextarea ? commentsTextarea.value || 'Sin comentarios' : 'N/A'}\n\n`;
+          });
+
+          // Fotos (solo ubicaciones, no las imágenes en sí)
+          reportText += "--- Evidencia Fotográfica (Ubicaciones) ---\n\n";
+          document.querySelectorAll('#photo-upload-container .input-group').forEach((group, index) => {
+              const locationInput = group.querySelector('.photo-location');
+              const imgPreview = group.querySelector('.photo-preview');
+              if (imgPreview && imgPreview.src && imgPreview.src !== window.location.href && !imgPreview.classList.contains('hidden')) {
+                  reportText += `Foto ${index + 1}: ${locationInput ? locationInput.value || 'Sin ubicación' : 'Sin ubicación'}\n`;
+              }
+          });
+          if (document.querySelectorAll('#photo-upload-container .input-group .photo-preview:not(.hidden)').length === 0) {
+              reportText += "No se adjuntaron fotos.\n";
+          }
+          reportText += "\n";
+
+          // Firmas
+          reportText += "--- Firmas ---\n";
+          const nombreTecnico = document.getElementById('tecnico').value;
+          const nombreSupervisor = document.getElementById('atiende').value;
+          reportText += `Técnico: ${nombreTecnico || 'Sin firmar'}\n`;
+          reportText += `Supervisor: ${nombreSupervisor || 'Sin firmar'}\n\n`;
+          
+          const autoFillNamesCheckbox = document.getElementById('autoFillNames');
+          if (autoFillNamesCheckbox) {
+              reportText += `Se queda todo en automático: ${autoFillNamesCheckbox.checked ? 'Sí' : 'No'}\n\n`;
+          }
+
+          // Observaciones
+          reportText += "--- Observaciones ---\n";
+          reportText += `${document.getElementById('observaciones').value || 'Sin observaciones'}\n\n`;
+
+          reportText += "------------------------------------";
+          return reportText;
+      }
+
       // Compartir PDF por WhatsApp
       document.getElementById("whatsappBtn").addEventListener("click", () => {
-        alert("Para compartir por WhatsApp, primero genera el PDF y luego adjúntalo manualmente desde la aplicación de WhatsApp. Este botón abrirá WhatsApp con un mensaje predefinido.");
-        const lugar = document.getElementById("lugar").value;
-        const tecnico = document.getElementById("tecnico").value;
-        const fecha = document.getElementById("fecha").value;
-        const mensaje = `Hola, te comparto el Reporte Técnico de Servicios RCI.\n\nLugar: ${lugar}\nTécnico: ${tecnico}\nFecha: ${fecha}\n\nFavor de adjuntar el PDF generado previamente.`;
-
-        // Se usa web.whatsapp.com para la versión de escritorio/móvil
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
+        const fullReportText = gatherFormDataAsText();
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(fullReportText)}`;
+        window.open(whatsappUrl, '_blank');
       });
 
     </script>
